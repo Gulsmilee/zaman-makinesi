@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Zaman Makinesi Tamircisi | Arel Üniversitesi</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/style.css" />
+
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+          "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+        }
+      }
+    </script>
+  </head>
+  <body class="bg-dark text-white overflow-hidden">
+    <div
+      id="alarm-filtresi"
+      class="position-fixed w-100 h-100 d-none"
+      style="
+        z-index: 1000;
+        pointer-events: none;
+        background: rgba(255, 0, 0, 0.2);
+      "
+    ></div>
+
+    <div class="container-fluid vh-100 p-3">
+      <div class="row h-100">
+        <div class="col-md-8 h-100">
+          <div class="card h-100 bg-black border-secondary shadow-lg p-1">
+            <div
+              id="game-container"
+              class="h-100 w-100 position-relative rounded overflow-hidden"
+            >
+              <span
+                class="position-absolute top-50 start-50 translate-middle text-white-50"
+                >3D Sahne (Three.js) Bekleniyor...</span
+              >
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-4 d-flex flex-column gap-3 h-100">
+          <div class="card bg-info text-dark border-0 shadow-sm">
+            <div class="card-body py-2">
+              <h6 class="fw-bold mb-1">🤖 Bip-Bop:</h6>
+              <p id="bipbop-mesaj" class="small mb-0">
+                3D Sistem başlatıldı Kaptan!! İlk parçayı bulmak için
+                komutlarını bekliyorum.
+              </p>
+            </div>
+          </div>
+
+          <div class="card bg-dark border-secondary">
+            <div class="card-body p-2 d-flex justify-content-between gap-1">
+              <button
+                id="btn-ileri"
+                class="btn btn-outline-info btn-sm flex-fill"
+              >
+                ⬆️ İleri
+              </button>
+              <button
+                id="btn-sag"
+                class="btn btn-outline-info btn-sm flex-fill"
+              >
+                ↪️ Sağ
+              </button>
+              <button
+                id="btn-sol"
+                class="btn btn-outline-info btn-sm flex-fill"
+              >
+                ↩️ Sol
+              </button>
+            </div>
+          </div>
+
+          <div
+            class="card bg-dark border-secondary flex-grow-1 overflow-hidden d-flex flex-column"
+          >
+            <div class="card-header py-1 small text-info border-secondary">
+              Mevcut Algoritma
+            </div>
+            <div
+              id="kod-akisi"
+              class="card-body p-2 overflow-auto flex-grow-1"
+            ></div>
+            <div class="card-footer border-secondary p-2">
+              <button id="btn-calistir" class="btn btn-success w-100 fw-bold">
+                ▶ 3D KODU ÇALIŞTIR
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="quizModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div
+          id="quiz-icerik"
+          class="modal-content bg-dark text-white border-info shadow-lg"
+        ></div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module" src="js/animasyon.js"></script>
+    <script type="module" src="js/bulmaca.js"></script>
+    <script type="module" src="js/motor.js"></script>
+  </body>
+</html>

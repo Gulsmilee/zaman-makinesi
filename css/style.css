@@ -1,0 +1,37 @@
+/* Ana Izgara Sistemi */
+#grid-container {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  grid-template-rows: repeat(5, 1fr);
+  gap: 8px;
+  background-color: #2c3e50;
+  padding: 10px;
+  border-radius: 12px;
+}
+
+/* Her Bir Kare */
+.hucre {
+  background-color: #ecf0f1;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+/* Robot/Karakter İkonu */
+.karakter {
+  width: 80%;
+  transition: transform 0.5s ease;
+}
+
+/* Seviye Temaları (3. Kişi bunları güncelleyecek) */
+.tema-dinozor {
+  background-color: #27ae60 !important;
+}
+.tema-misir {
+  background-color: #f1c40f !important;
+}
+.tema-uzay {
+  background-color: #2c3e50 !important;
+}
