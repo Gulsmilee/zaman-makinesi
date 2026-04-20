@@ -29,8 +29,8 @@ Bu proje, 5 kişilik bir ekip tarafından 3 günlük yoğun bir sprint süreciyl
 - **Gülbahar Doğan** - Technical  & Entegrasyon Sorumlusu
 - **Melike Temiz** - Oyun Motoru & Hareket Algoritması
 - **Şüheda Nur Gül** - Seviye & Çevre Tasarımcısı
-- **Elif Zeynep ALpay** - Bulmaca & Etkileşim Yöneticisi
-- **Mustafa Efe Aydın** - Multimedya & Animasyon Yöneticisi
+- **Mustafa Efe Aydın** - Bulmaca & Etkileşim Yöneticisi
+- **Elif Zeynep Alpay** - Multimedya & Animasyon Yöneticisi
 
 ---
 *Bu proje, geleceğin yazılımcıları olan çocuklara armağan edilmiştir.!* 🎈
