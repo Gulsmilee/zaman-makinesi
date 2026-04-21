@@ -1,5 +1,5 @@
 /* Ana Izgara Sistemi */
-#grid-container {
+#game-container {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   grid-template-rows: repeat(5, 1fr);
@@ -21,8 +21,33 @@
 
 /* Robot/Karakter İkonu */
 .karakter {
-  width: 80%;
-  transition: transform 0.5s ease;
+  .karakter {
+    width: 80%;
+    transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Daha doğal bir zıplama efekti */
+    filter: drop-shadow(
+      0 0 5px rgba(0, 255, 255, 0.5)
+    ); /* Robota hafif bir teknolojik parlama */
+  }
+}
+
+.hedef-hucre {
+  border: 2px dashed #3498db;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
 }
 
 /* Seviye Temaları (3. Kişi bunları güncelleyecek) */
