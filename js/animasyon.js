@@ -1,4 +1,4 @@
-// Ses dosyalarının tanımlanması
+// SES DOSYALARI
 const sesler = {
     click: new Audio('assets/sounds/click.mp3'),
     error: new Audio('assets/sounds/error.mp3'),
@@ -6,39 +6,43 @@ const sesler = {
     teleport: new Audio('assets/sounds/teleport.mp3')
 };
 
-// Temel ses fonksiyonları
+// SES FONKSİYONLARI
 function tiklamaSesi() { 
-    sesler.click.play().catch(e => console.warn("Etkileşim bekleniyor.")); 
+    sesler.click.currentTime = 0;
+    sesler.click.play().catch(() => {}); 
 }
 
 function hataSesi() { 
-    sesler.error.play().catch(e => console.warn("Hata sesi çalınamadı.")); 
+    sesler.error.currentTime = 0;
+    sesler.error.play().catch(() => {}); 
 }
 
 function basariSesi() { 
-    sesler.success.play().catch(e => console.warn("Başarı sesi çalınamadı.")); 
+    sesler.success.currentTime = 0;
+    sesler.success.play().catch(() => {}); 
 }
 
-// Işınlanma efekti (Parlama + Ses)
+// Işınlanma efekti(Parlama + ses)
 function isinlanmaEfekti() {
-    sesler.teleport.play().catch(e => console.warn("Ses hatası."));
+    sesler.teleport.currentTime = 0;
+    sesler.teleport.play().catch(() => {});
 
-    const flas = document.createElement('div');
-    flas.style.cssText = `
+    const flash = document.createElement('div');
+    flash.style.cssText = `
         position: fixed; top: 0; left: 0; width: 100%; height: 100%;
         background: white; z-index: 10000; transition: opacity 0.6s;
     `;
-    document.body.appendChild(flas);
+    document.body.appendChild(flash);
 
     setTimeout(() => {
-        flas.style.opacity = '0';
-        setTimeout(() => flas.remove(), 600);
+        flash.style.opacity = '0';
+        setTimeout(() => flash.remove(), 600);
     }, 100);
 }
 
-// Başarı anında patlayan renkli konfetiler
+// KONFETİ EFEKTİ
 function konfetiPatlat() {
-    basariSesi(); // Konfetiyle birlikte başarı sesini de çal
+    basariSesi();
     for (let i = 0; i < 40; i++) {
         const k = document.createElement('div');
         k.style.cssText = `
@@ -51,16 +55,19 @@ function konfetiPatlat() {
             { transform: 'translateY(0)', opacity: 1 },
             { transform: `translate(${Math.random()*200-100}px, 100vh)`, opacity: 0 }
         ], { duration: 2000 + Math.random()*2000 });
+
         setTimeout(() => k.remove(), 4000);
     }
 }
 
-// Robot konuşma efekti
+// ROBOT YAZI EFEKTİ
 function bipBopYaz(metin, elementId = "bipbop-mesaj") {
     const el = document.getElementById(elementId);
     if (!el) return;
+
     el.innerHTML = "";
     let i = 0;
+
     const yazici = setInterval(() => {
         if (i < metin.length) {
             el.innerHTML += metin[i];
@@ -71,10 +78,18 @@ function bipBopYaz(metin, elementId = "bipbop-mesaj") {
     }, 50);
 }
 
-// Global erişim için window objesine bağlama
+// GLOBAL BAĞLAMA
 window.tiklamaSesi = tiklamaSesi;
 window.hataSesi = hataSesi;
 window.basariSesi = basariSesi;
 window.isinlanmaEfekti = isinlanmaEfekti;
 window.konfetiPatlat = konfetiPatlat;
 window.bipBopYaz = bipBopYaz;
+
+// 🔗 EKİPLE UYUMLU İSİMLER
+window.hataSesiCal = hataSesi;
+
+window.basariEfektiOynat = function() {
+    basariSesi();
+    konfetiPatlat();
+};
