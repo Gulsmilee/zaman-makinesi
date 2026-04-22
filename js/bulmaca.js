@@ -1,5 +1,6 @@
 /*
  * Bu dosya, çocuğun karşısına çıkacak eğitim sorularını ve arayüzü yönetir.
+ * Çoktan seçmeli ve basitleştirilmiş sorulara göre güncellenmiştir.
  */
 
 // === 1. EĞİTİM/KODLAMA SORULARI VERİTABANI ===
@@ -9,20 +10,22 @@ const bulmacaVeritabani = [
     tema: "Dinozorlar Çağı",
     sorular: [
       {
-        soru: "Kaptan! Dinozor yumurtalarını kırmamak için komutları arka arkaya doğru bir sıraya koyduk. Kodlamada buna ne ad verilir?",
-        cevap: "sıralama",
-        ipucu:
-          "S... ile başlayan, şeyleri art arda dizmek anlamına gelen bir kelime.",
+        soru: "Robotumuzun yapacağı görevleri arka arkaya, kuralına göre dizmeye ne ad veririz?",
+        secenekler: ["Sıralama", "Zıplama", "Saklanma"],
+        dogruCevap: "Sıralama",
+        ipucu: "Olayların belli bir düzene göre art arda gelmesidir.",
       },
       {
-        soru: "Robot Bip-Bop komutları teker teker, adım adım okur. Bu adım adım işleyişe ne diyoruz?",
-        cevap: "algoritma",
-        ipucu: "A... ile başlar. Bir problemi çözmek için izlenen yol.",
+        soru: "Robot Bip-Bop'un bir problemi çözmek için adım adım izlediği yola ne denir?",
+        secenekler: ["Batarya", "Algoritma", "Ekran"],
+        dogruCevap: "Algoritma",
+        ipucu: "'A' harfi ile başlar, bir işi başarmak için hazırlanan plandır.",
       },
       {
-        soru: "Eğer 'İleri' komutundan sonra 'Sağa Dön' komutunu verirsek karakterimiz önce hangi komutu yapar?",
-        cevap: "ileri",
-        ipucu: "Kodlar her zaman yukarıdan aşağıya ve sırasıyla okunur.",
+        soru: "Robotumuza önce 'İleri Git', sonra 'Sağa Dön' dedik. Robot ilk olarak hangisini yapar?",
+        secenekler: ["Sağa Dön", "Bekle", "İleri Git"],
+        dogruCevap: "İleri Git",
+        ipucu: "Kodlar her zaman en üstten okunmaya başlar.",
       },
     ],
   },
@@ -31,19 +34,22 @@ const bulmacaVeritabani = [
     tema: "Antik Mısır",
     sorular: [
       {
-        soru: "Uzun piramit koridorlarını geçerken aynı komutu defalarca yazmak yerine hangi yapıyı kullanarak kodumuzu kısalttık?",
-        cevap: "döngü",
-        ipucu: "D... ile başlayan, tekrar eden işler için kullandığımız yapı.",
+        soru: "Aynı komutu alt alta defalarca yazmak yerine, işimizi kolaylaştıran hangi yapıyı kullanırız?",
+        secenekler: ["Döngü", "Bitiş", "Hata"],
+        dogruCevap: "Döngü",
+        ipucu: "Tekrar eden işleri tek bir komutla yapmamızı sağlar.",
       },
       {
-        soru: "Bip-Bop'un 5 kere 'İleri' gitmesi gerekiyor. 5 tane İleri yazmak yerine '5 kez tekrarla' demek kodumuzu nasıl etkiler?",
-        cevap: "kısaltır",
-        ipucu: "K... ile başlar. Daha az kod yazmamızı sağlar.",
+        soru: "'5 kez İleri Git' demek, alt alta 5 tane 'İleri' yazmaya göre kodumuzu nasıl etkiler?",
+        secenekler: ["Uzatır", "Kısaltır", "Bozar"],
+        dogruCevap: "Kısaltır",
+        ipucu: "Daha az yazı yazarak aynı işi yapmış oluruz.",
       },
       {
-        soru: "Bir işlemin sürekli, hiç durmadan baştan başlamasına ne ad verilir?",
-        cevap: "sonsuz döngü",
-        ipucu: "S... D... şeklindedir. Hiç bitmeyen bir tekrar anlamına gelir.",
+        soru: "Bir işlemin hiç durmadan, sürekli başa sarıp tekrarlanmasına ne ad verilir?",
+        secenekler: ["Uyku Modu", "Hızlı Çalışma", "Sonsuz Döngü"],
+        dogruCevap: "Sonsuz Döngü",
+        ipucu: "Hiç bitmeyen, sonsuza kadar süren bir tekrardır.",
       },
     ],
   },
@@ -52,19 +58,22 @@ const bulmacaVeritabani = [
     tema: "Uzay İstasyonu",
     sorular: [
       {
-        soru: "Karşımıza meteor çıkarsa sağa kaç, çıkmazsa düz git demek için hangi mantıksal karar yapısını kullanırız?",
-        cevap: "eğer",
-        ipucu: "İngilizcesi 'IF' olan şart yapısı...",
+        soru: "'Karşına meteor çıkarsa sağa dön' derken, kararlarımız için hangi yapıyı kullanırız?",
+        secenekler: ["Eğer", "Geri", "Sil"],
+        dogruCevap: "Eğer",
+        ipucu: "Bir şartımız olduğunda kullandığımız kelimedir.",
       },
       {
-        soru: "Eğer (Meteor Varsa) { Sağa Dön } değilse { Düz Git } kodunda meteor yoksa karakter ne yapar?",
-        cevap: "düz git",
-        ipucu: "Şart sağlanmadığı ('değilse') için yapılan işlem nedir?",
+        soru: "Eğer (Engel Varsa) { Sağa Dön } değilse { Düz Git }. Peki engel YOKSA robotumuz ne yapar?",
+        secenekler: ["Durur", "Düz Git", "Sağa Dön"],
+        dogruCevap: "Düz Git",
+        ipucu: "Engel olma şartı gerçekleşmediğinde yapılacak olan eylemi seçmelisin.",
       },
       {
-        soru: "Oyun motorunda parçaya 'Eğer hedefe ulaşıldıysa' ne yapılır?",
-        cevap: "dur",
-        ipucu: "D... ile başlar. Parçayı alınca kodun çalışması biter.",
+        soru: "Hedefe ulaştığımızda oyunun bitmesi için hangi komutu vermeliyiz?",
+        secenekler: ["Hızlan", "Zıpla", "Dur"],
+        dogruCevap: "Dur",
+        ipucu: "Oyunun veya hareketin sona ermesini sağlar.",
       },
     ],
   },
@@ -87,24 +96,16 @@ function modalIceriginiHazirla() {
         <div class="modal-body text-center p-4">
             <div class="mb-3 bg-secondary rounded p-3 text-start">
                 <strong class="text-info">🤖 Bip-Bop:</strong>
-                <p class="mb-0 mt-1 small">Parçayı alabilmek için bu soruyu cevaplamalısın Kaptan!</p>
+                <p class="mb-0 mt-1 small">Parçayı alabilmek için doğru seçeneği işaretlemelisin Kaptan!</p>
             </div>
-            <h5 id="soru-metni" class="mb-4">Soru yükleniyor...</h5>
-            <input type="text" id="cevap-input" class="form-control bg-dark text-white border-info text-center form-control-lg" placeholder="Cevabını buraya yaz...">
+            <h5 id="soru-metni" class="mb-4 fw-bold">Soru yükleniyor...</h5>
+            
+            <div id="secenekler-alani" class="d-flex flex-column gap-3 mb-3">
+                </div>
+
             <p id="ipucu-metni" class="text-warning mt-3 small fw-bold fs-6" style="display: none;"></p>
         </div>
-        <div class="modal-footer border-info justify-content-center">
-            <button type="button" class="btn btn-info px-5 fw-bold" onclick="window.cevabiKontrolEt()">Şifreyi Onayla</button>
-        </div>
     `;
-
-  document
-    .getElementById("cevap-input")
-    .addEventListener("keypress", function (event) {
-      if (event.key === "Enter") {
-        window.cevabiKontrolEt();
-      }
-    });
 }
 
 // === 3. MOTOR İLE BAĞLANTI ===
@@ -113,7 +114,7 @@ window.soruEkraniAc = function () {
 
   if (window.mevcutSeviyeIndeksi >= bulmacaVeritabani.length) return;
 
-  if (document.getElementById("cevap-input") === null) {
+  if (document.getElementById("secenekler-alani") === null) {
     modalIceriginiHazirla();
   }
 
@@ -123,8 +124,19 @@ window.soruEkraniAc = function () {
 
   document.getElementById("tema-baslik").innerText = aktifSeviye.tema;
   document.getElementById("soru-metni").innerText = aktifRastgeleSoru.soru;
-  document.getElementById("cevap-input").value = "";
   document.getElementById("ipucu-metni").style.display = "none";
+
+  // Seçenekleri Ekrana Çizdirme
+  const seceneklerAlani = document.getElementById("secenekler-alani");
+  seceneklerAlani.innerHTML = ""; // Önceki seçenekleri temizle
+
+  aktifRastgeleSoru.secenekler.forEach(secenek => {
+    seceneklerAlani.innerHTML += `
+      <button class="btn btn-dark border-info text-white btn-lg fw-bold" onclick="window.cevabiKontrolEt('${secenek}')">
+        ${secenek}
+      </button>
+    `;
+  });
 
   const modalElement = document.getElementById("quizModal");
   if (!quizModalInstance) {
@@ -134,19 +146,14 @@ window.soruEkraniAc = function () {
     });
   }
   quizModalInstance.show();
-
-  setTimeout(() => document.getElementById("cevap-input").focus(), 500);
 };
 
 // === 4. CEVAP KONTROL MANTIĞI ===
-window.cevabiKontrolEt = function () {
-  const inputElement = document.getElementById("cevap-input");
-  const kullaniciCevabi = inputElement.value.trim().toLowerCase();
-  const dogruCevap = aktifRastgeleSoru.cevap.toLowerCase();
+// Kullanıcının tıkladığı seçeneği parametre olarak alıyoruz
+window.cevabiKontrolEt = function (secilenCevap) {
+  const dogruCevap = aktifRastgeleSoru.dogruCevap;
 
-  if (kullaniciCevabi === "") return;
-
-  if (kullaniciCevabi === dogruCevap) {
+  if (secilenCevap === dogruCevap) {
     console.log("Cevap Doğru!");
     quizModalInstance.hide();
 
