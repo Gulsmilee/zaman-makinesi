@@ -1,9 +1,3 @@
-/*
- * Bu dosya, çocuğun karşısına çıkacak eğitim sorularını ve arayüzü yönetir.
- * Çoktan seçmeli ve basitleştirilmiş sorulara göre güncellenmiştir.
- */
-
-// === 1. EĞİTİM/KODLAMA SORULARI VERİTABANI ===
 const bulmacaVeritabani = [
   {
     seviye: 1,
@@ -40,7 +34,7 @@ const bulmacaVeritabani = [
         ipucu: "Tekrar eden işleri tek bir komutla yapmamızı sağlar.",
       },
       {
-        soru: "'5 kez İleri Git' demek, alt alta 5 tane 'İleri' yazmaya göre kodumuzu nasıl etkiler?",
+        soru: "5 kez İleri Git demek, alt alta 5 tane İleri yazmaya göre kodumuzu nasıl etkiler?",
         secenekler: ["Uzatır", "Kısaltır", "Bozar"],
         dogruCevap: "Kısaltır",
         ipucu: "Daha az yazı yazarak aynı işi yapmış oluruz.",
@@ -58,7 +52,7 @@ const bulmacaVeritabani = [
     tema: "Uzay İstasyonu",
     sorular: [
       {
-        soru: "'Karşına meteor çıkarsa sağa dön' derken, kararlarımız için hangi yapıyı kullanırız?",
+        soru: "Karşına meteor çıkarsa sağa dön derken, kararlarımız için hangi yapıyı kullanırız?",
         secenekler: ["Eğer", "Geri", "Sil"],
         dogruCevap: "Eğer",
         ipucu: "Bir şartımız olduğunda kullandığımız kelimedir.",
@@ -79,12 +73,10 @@ const bulmacaVeritabani = [
   },
 ];
 
-// --- KRİTİK DEĞİŞİKLİK: Değişkeni window objesine bağladık ---
 window.mevcutSeviyeIndeksi = 0;
 let quizModalInstance = null;
 let aktifRastgeleSoru = null;
 
-// === 2. ARAYÜZ (HTML) ENJEKSİYONU ===
 function modalIceriginiHazirla() {
   const quizIcerik = document.getElementById("quiz-icerik");
   if (!quizIcerik) return;
@@ -101,17 +93,14 @@ function modalIceriginiHazirla() {
             <h5 id="soru-metni" class="mb-4 fw-bold">Soru yükleniyor...</h5>
             
             <div id="secenekler-alani" class="d-flex flex-column gap-3 mb-3">
-                </div>
+            </div>
 
             <p id="ipucu-metni" class="text-warning mt-3 small fw-bold fs-6" style="display: none;"></p>
         </div>
     `;
 }
 
-// === 3. MOTOR İLE BAĞLANTI ===
 window.soruEkraniAc = function () {
-  console.log("Motor parça buldu! Soru ekranı açılıyor...");
-
   if (window.mevcutSeviyeIndeksi >= bulmacaVeritabani.length) return;
 
   if (document.getElementById("secenekler-alani") === null) {
@@ -126,9 +115,8 @@ window.soruEkraniAc = function () {
   document.getElementById("soru-metni").innerText = aktifRastgeleSoru.soru;
   document.getElementById("ipucu-metni").style.display = "none";
 
-  // Seçenekleri Ekrana Çizdirme
   const seceneklerAlani = document.getElementById("secenekler-alani");
-  seceneklerAlani.innerHTML = ""; // Önceki seçenekleri temizle
+  seceneklerAlani.innerHTML = "";
 
   aktifRastgeleSoru.secenekler.forEach(secenek => {
     seceneklerAlani.innerHTML += `
@@ -148,36 +136,28 @@ window.soruEkraniAc = function () {
   quizModalInstance.show();
 };
 
-// === 4. CEVAP KONTROL MANTIĞI ===
-// Kullanıcının tıkladığı seçeneği parametre olarak alıyoruz
 window.cevabiKontrolEt = function (secilenCevap) {
   const dogruCevap = aktifRastgeleSoru.dogruCevap;
 
   if (secilenCevap === dogruCevap) {
-    console.log("Cevap Doğru!");
     quizModalInstance.hide();
-
-    // 1. Önce seviyeyi arttırıyoruz
     window.mevcutSeviyeIndeksi++;
 
-    // 2. Motoru (0,0 noktasına) sıfırlıyoruz
     if (typeof window.yeniSeviyeyeHazirlan === "function") {
       window.yeniSeviyeyeHazirlan();
     }
 
-    // 3. Başarı sesini çal (varsa)
     if (typeof window.basariEfektiOynat === "function") {
       window.basariEfektiOynat();
     }
 
-    // 4. Oyun sonu kontrolü
     if (window.mevcutSeviyeIndeksi >= bulmacaVeritabani.length) {
       setTimeout(() => {
         alert("🎉 GÖREV BAŞARILI KAPTAN! Zaman makinesi tamir edildi!");
+        if (window.oyunuSifirla) window.oyunuSifirla();
       }, 1000);
     }
   } else {
-    console.log("Cevap Yanlış!");
     const ipucuMetni = document.getElementById("ipucu-metni");
     ipucuMetni.innerText = "Hatalı şifre! 🤖 İpucu: " + aktifRastgeleSoru.ipucu;
     ipucuMetni.style.display = "block";
