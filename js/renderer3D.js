@@ -119,7 +119,10 @@ window.renderer3D = {
     async loadEnvironment(path, offset = {x:0, y:0, z:0}, customScale = 30, charHeight = 0, targetPath = null) {
         this.clearEra();
         this.charHeight = charHeight;
+<<<<<<< HEAD
         this.currentHoverY = charHeight; // başlangıç yüksekliği
+=======
+>>>>>>> a88738f1bce31aa7d6b9aaf9c359bbb00a29d2e1
         const loader = new THREE.GLTFLoader();
         
         const envPromise = new Promise((resolve) => {

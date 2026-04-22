@@ -2,6 +2,7 @@ let komutKuyrugu = [];
 let karakterPozisyon = { x: 0, z: 0 };
 let karakterYon = 0;
 
+<<<<<<< HEAD
 window.engineState = {
     currentPos: { x: 0, z: 0 },
     targetPos: { x: 0, z: 0 },
@@ -9,6 +10,8 @@ window.engineState = {
     targetRot: 0
 };
 
+=======
+>>>>>>> a88738f1bce31aa7d6b9aaf9c359bbb00a29d2e1
 const btnIleri = document.getElementById("btn-ileri");
 const btnSag = document.getElementById("btn-sag");
 const btnSol = document.getElementById("btn-sol");
@@ -21,6 +24,7 @@ if (btnSag) btnSag.addEventListener("click", () => komutEkle("sağa dön"));
 if (btnSol) btnSol.addEventListener("click", () => komutEkle("sola dön"));
 if (btnCalistir) btnCalistir.addEventListener("click", algoritmayiCalistir);
 
+<<<<<<< HEAD
 const btnTemizle = document.getElementById("btn-temizle");
 if (btnTemizle) {
   btnTemizle.addEventListener("click", () => {
@@ -53,6 +57,8 @@ window.algoritmayiTemizle = function() {
   bipBopMesaj.innerText = "🤖: Hafıza temizlendi! Yeni rota bekliyorum.";
 };
 
+=======
+>>>>>>> a88738f1bce31aa7d6b9aaf9c359bbb00a29d2e1
 function komutEkle(komut) {
   komutKuyrugu.push(komut);
   const yeniKomutSatiri = document.createElement("div");
@@ -102,9 +108,15 @@ function mantiksalHesaplama(komut) {
     if (karakterYon === 180) karakterPozisyon.z--;
     if (karakterYon === 270) karakterPozisyon.x--;
   } else if (komut === "sağa dön") {
+<<<<<<< HEAD
     karakterYon = (karakterYon + 270) % 360;
   } else if (komut === "sola dön") {
     karakterYon = (karakterYon + 90) % 360;
+=======
+    karakterYon = (karakterYon + 90) % 360;
+  } else if (komut === "sola dön") {
+    karakterYon = (karakterYon + 270) % 360;
+>>>>>>> a88738f1bce31aa7d6b9aaf9c359bbb00a29d2e1
   }
 
   if (window.karakteri3DHareketEttir) {
@@ -113,6 +125,7 @@ function mantiksalHesaplama(komut) {
 }
 
 function hedefKontrol() {
+<<<<<<< HEAD
   const hedef = window.mevcutHedef || { x: 2, z: 2 };
 
   if (karakterPozisyon.x === hedef.x && karakterPozisyon.z === hedef.z) {
@@ -120,6 +133,13 @@ function hedefKontrol() {
     if (window.hedefeUlasildiTetikle) {
       window.hedefeUlasildiTetikle();
     } else if (window.soruEkraniAc) {
+=======
+  const hedef = { x: 2, z: 2 };
+
+  if (karakterPozisyon.x === hedef.x && karakterPozisyon.z === hedef.z) {
+    bipBopMesaj.innerText = "🤖: MÜKEMMEL! Parçayı bulduk!";
+    if (window.soruEkraniAc) {
+>>>>>>> a88738f1bce31aa7d6b9aaf9c359bbb00a29d2e1
       window.soruEkraniAc();
     }
     return true;
