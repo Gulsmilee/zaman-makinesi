@@ -142,8 +142,14 @@ const CHARACTER_ASSETS = {
         envPath: "assets/mushrooms/scene.gltf",
         targetPath: null,
         envOffset:  { x: 0, y: 0, z: 0 },
-        envScale:   16,
-        gridOffset: null
+        envScale:   120, // Increased scale to fix tiny island
+        gridOffset: null,
+        rayY: 12,
+        hideDome: true,
+        ambientColor: 0x5588ff,
+        ambientIntensity: 0.5,
+        pointColor: 0x00ffff,
+        pointIntensity: 2.2
     }
 ];
 
@@ -190,10 +196,22 @@ function temayiGuncelle() {
             if (window.renderer3D.resetGridCentre) {
                 window.renderer3D.resetGridCentre();
             }
+            if (window.renderer3D.setHideOuterDome) {
+                window.renderer3D.setHideOuterDome(!!aktifTema.hideDome);
+            }
+            if (window.renderer3D.setThemeLighting) {
+                window.renderer3D.setThemeLighting(
+                    aktifTema.ambientColor || 0xffffff,
+                    aktifTema.ambientIntensity || 0.65,
+                    aktifTema.pointColor || 0x00ffff,
+                    aktifTema.pointIntensity || 0
+                );
+            }
+            window.renderer3D.setRayOriginY(aktifTema.rayY || 60);
             window.renderer3D.loadEnvironment(
                 aktifTema.envPath,
                 aktifTema.envOffset || { x: 0, y: 0, z: 0 },
-                aktifTema.envScale  || 16
+                aktifTema.envScale  || 18
             ).then(() => {
                 // Apply manual grid offset after environment loads (matrices are ready)
                 if (aktifTema.gridOffset && window.renderer3D.setGridCentre) {

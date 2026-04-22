@@ -25,12 +25,15 @@ window.renderer3D = (function () {
     let target      = null;
     let shadowDisc  = null;
     let hologrid    = null;
+    let ambientLight, directionalLight, pointLight;
 
     let envMixers  = [];
     let charMixers = [];
 
     let gridCX = 0, gridCZ = 0;    // current grid centre (world space)
     let gridManual = false;         // true = use manually set centre, skip auto-detect
+    let rayStartY = 60;
+    let hideOuterDome = false;
 
     // Target tracking for smooth movement
     let targetPos = new THREE.Vector3(0, 0, 0);
@@ -42,7 +45,7 @@ window.renderer3D = (function () {
     /** Sample the highest terrain point at world (wx, wz). Returns Y or null. */
     function sampleY(wx, wz) {
         if (!environment) return null;
-        _rc.set(new THREE.Vector3(wx, 60, wz), _dn);
+        _rc.set(new THREE.Vector3(wx, rayStartY, wz), _dn);
         const hits = _rc.intersectObject(environment, true);
         if (!hits.length) return null;
         // Highest surface (sort desc by Y)
@@ -175,8 +178,28 @@ window.renderer3D = (function () {
         get gridCols()  { return COLS; },
         get gridRows()  { return ROWS; },
         get character() { return character; },
-        get bipBop()    { return bipBop; },
+        get controls()  { return controls; },
         get target()    { return target; },
+
+        setRayOriginY(y) {
+            rayStartY = y;
+        },
+
+        setHideOuterDome(val) {
+            hideOuterDome = val;
+        },
+
+        setThemeLighting(ambientColor, ambientIntensity, pointColor, pointIntensity) {
+            if (ambientLight) {
+                ambientLight.color.setHex(ambientColor);
+                ambientLight.intensity = ambientIntensity;
+            }
+            if (pointLight) {
+                pointLight.color.setHex(pointColor);
+                pointLight.intensity = pointIntensity;
+                pointLight.position.set(gridCX, 3, gridCZ); // Glow from the island center
+            }
+        },
 
         /** Manually fix the grid centre to a specific world XZ point.
          *  Call BEFORE loadEnvironment or right after for instant effect. */
@@ -212,10 +235,17 @@ window.renderer3D = (function () {
             camera.position.set(0, 12, 18);
             camera.lookAt(0, 0, 0);
 
-            scene.add(new THREE.AmbientLight(0xffffff, 0.65));
-            const dir = new THREE.DirectionalLight(0xffffff, 1.0);
-            dir.position.set(10, 20, 10);
-            scene.add(dir);
+            scene.add(new THREE.AmbientLight(0xffffff, 0.2)); // Baseline low light
+            
+            ambientLight = new THREE.AmbientLight(0xffffff, 0.65);
+            scene.add(ambientLight);
+            
+            directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            directionalLight.position.set(10, 20, 10);
+            scene.add(directionalLight);
+
+            pointLight = new THREE.PointLight(0x00ffff, 0, 50); // Glowing point for mushroom centers etc.
+            scene.add(pointLight);
 
             controls = new THREE.OrbitControls(camera, renderer.domElement);
             controls.enableDamping   = true;
@@ -269,6 +299,24 @@ window.renderer3D = (function () {
             mesh.position.set(-scaledCentre.x, -scaledBox.min.y, -scaledCentre.z);
             group.position.set(offset.x, offset.y, offset.z);
             group.add(mesh);
+
+            if (hideOuterDome) {
+                group.traverse(child => {
+                    if (child.isMesh) {
+                        child.geometry.computeBoundingSphere();
+                        const r = child.geometry.boundingSphere ? child.geometry.boundingSphere.radius : 0;
+                        // Outer dome logic: keep visible for texture/bg but disable for grid/snapping
+                        if (r > 40 || child.name.toLowerCase().includes("dome") || child.name.toLowerCase().includes("sky") || child.name.toLowerCase().includes("sphere")) {
+                            child.raycast = function() {}; // fully ignore collisions
+                            if (child.material) {
+                                child.material.side = THREE.DoubleSide; // see from inside
+                                child.material.transparent = true;
+                                child.material.opacity = Math.max(child.material.opacity, 0.9);
+                            }
+                        }
+                    }
+                });
+            }
 
             environment = group;
             scene.add(environment);
