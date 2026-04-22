@@ -1,0 +1,11 @@
+Model Information:
+* title:	Diorama TREX rigged free
+* source:	https://sketchfab.com/3d-models/diorama-trex-rigged-free-39ed0dfaa0b5432598f1c997adbf64f4
+* author:	vmmaniac (https://sketchfab.com/vmmaniac)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Diorama TREX rigged free" (https://sketchfab.com/3d-models/diorama-trex-rigged-free-39ed0dfaa0b5432598f1c997adbf64f4) by vmmaniac (https://sketchfab.com/vmmaniac) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
