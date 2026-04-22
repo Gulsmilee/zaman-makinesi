@@ -1,36 +1,35 @@
-# ⏱️ Zaman Makinesi Tamircisi (Time Machine Repairman)
+# ⏱️ Zaman Makinesi (Time Machine)
 
 ![License](https://img.shields.io/badge/License-MIT-blue.svg)
-![Status](https://img.shields.io/badge/Status-Development-orange.svg)
+![Status](https://img.shields.io/badge/Status-Production-brightgreen.svg)
 ![Target](https://img.shields.io/badge/Target-Kids_Learning-brightgreen.svg)
 
-**Zaman Makinesi Tamircisi**, 23 Nisan Çocuk Şenliği kapsamında çocuklara kodlama mantığını sevdirmek için tasarlanmış bir web oyunudur. Oyuncular, laboratuvarında talihsiz bir kaza yaşayan ana karakter ve sadık robot dostu **Bip-Bop** ile birlikte zamanda yolculuğa çıkarak, parçalanan zaman makinesinin parçalarını farklı çağlardan toplarlar.
+**Zaman Makinesi**, çocuklara kodlama mantığını modern ve büyüleyici bir 3D dünyada sevdirmek için tasarlanmış profesyonel bir web oyunudur. Oyuncular, sadık robot dostu **Bip-Bop** ile birlikte zamanda yolculuğa çıkarak, parçalanan zaman makinesinin parçalarını Dinozorlar Çağı, Antik Mısır ve Uzay gibi farklı dönemlerden toplarlar.
 
-## 🚀 Proje Amacı
-Bu proje, algoritma dünyasına yeni adım atan çocuklara;
-- **Sıralama (Sequencing):** Komutları doğru sıraya koyma.
-- **Döngüler (Loops):** Tekrar eden işleri kısaltma.
-- **Koşullu İfadeler (Conditionals):** Mantıksal kararlar verme.
-gibi temel kavramları oyunlaştırılmış bir deneyimle kazandırmayı amaçlar.
+## 🚀 Öne Çıkan Özellikler
+- **Gerçek Zamanlı 3D Motor:** Three.js ile geliştirilen, engebeli arazilerde süzülen (hovercraft) karakter fiziği.
+- **Dinamik Yükseklik Sistemi (Grounding):** Raycaster teknolojisi kullanarak zemine tam uyumlu hareket mekanizması.
+- **Modern UI (Glassmorphism):** Şeffaf, fütüristik ve kullanıcı dostu arayüz tasarımı.
+- **Eğitici Algoritma Mantığı:** Çocukların adım adım problem çözme yeteneklerini geliştiren komut sistemi.
 
 ## 🗺️ Macera Durakları
-1. **🦖 Dinozorlar Çağı:** Yumurtalara çarpmadan "Zümrüt Çekirdek"e ulaş! (Temel Algoritma)
-2. **🏺 Antik Mısır:** Piramit koridorlarını aş ve "Mavi Kristal Dişli"yi bul! (Döngü Mantığı)
-3. **🚀 Uzay İstasyonu:** Meteorlardan kaçarak "Ana İşlemci"yi kurtar! (Eğer/İse Karar Yapıları)
+1. **🦖 Dinozorlar Çağı:** "Zümrüt Yumurta"ya ulaşmak için arazide süzül! (Temel Algoritma)
+2. **🏺 Antik Mısır:** Piramitlerin gizemli kumlarında parçayı bul! (Döngü Mantığı)
+3. **🚀 Uzay:** Meteorlar arasında süzülerek ana işlemciyi kurtar! (Şart Yapıları)
 
-## 🛠️ Kullanılan Teknolojiler
-- **Frontend:** HTML5, CSS3, Bootstrap 5
-- **Logic:** JavaScript (Vanilla JS)
-- **Visuals:** 2D Grid System & Animasyonlar
+## 🛠️ Teknik Altyapı
+- **Motor:** Three.js (3D Rendering)
+- **Arayüz:** HTML5, CSS3 (Glassmorphism), Bootstrap 5
+- **Mantık:** JavaScript (Vanilla JS - Modular)
 
-## 👥 Ekip (Arel Üniversitesi - Computer Engineering)
-Bu proje, 5 kişilik bir ekip tarafından 3 günlük yoğun bir sprint süreciyle geliştirilmiştir.
+## 👥 Geliştirici Ekibi
+Bu proje, geleceğin yazılımcıları olan çocuklara armağan edilmiştir.
 
-- **Gülbahar Doğan** - Technical  & Entegrasyon Sorumlusu
-- **Melike Temiz** - Oyun Motoru & Hareket Algoritması
-- **Şüheda Nur Gül** - Seviye & Çevre Tasarımcısı
-- **Mustafa Efe Aydın** - Bulmaca & Etkileşim Yöneticisi
-- **Elif Zeynep Alpay** - Multimedya & Animasyon Yöneticisi
+- **Gülbahar Doğan** - Entegrasyon Sorumlusu
+- **Melike Temiz** - Hareket Algoritması
+- **Şüheda Nur Gül** - Tasarımcı
+- **Mustafa Efe Aydın** - Etkileşim Yöneticisi
+- **Elif Zeynep Alpay** - Animasyon Yöneticisi
 
 ---
-*Bu proje, geleceğin yazılımcıları olan çocuklara armağan edilmiştir.!* 🎈
+*Geleceği bugünden kodluyoruz!* 🎈
