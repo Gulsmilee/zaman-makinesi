@@ -116,70 +116,34 @@ const CHARACTER_ASSETS = {
 
   const temalar = [
     {
-        sinif: "tema-dinozor-yol",
-        baslik: "Dinozorlar Çağı - Balta Girmemiş Orman",
-        hedefHTML: "",
-        tur: "yol",
-        envPath: "assets/diorama_trex_rigged_free/scene.gltf",
-        targetPath: "assets/a_dinosaur_cub_sitting_in_a_dinosaur_egg/scene.gltf", 
-        envOffset: { x: -18, y: -33, z: -16 },
-        envScale: 55,
-        charBaseY: 0.1 
-    },
-    {
         sinif: "tema-dinozor-oda",
-        baslik: "Dinozorlar Çağı - Dinozor Yuvası",
+        baslik: "Dinozorlar Çağı - Balta Girmemiş Orman",
         hedefHTML: `🥚`,
-        tur: "oda",
         envPath: "assets/diorama_trex_rigged_free/scene.gltf",
         targetPath: "assets/a_dinosaur_cub_sitting_in_a_dinosaur_egg/scene.gltf",
-        envOffset: { x: -18, y: -33, z: -16 },
-        envScale: 55,
-        charBaseY: 0.1 
-    },
-    {
-        sinif: "tema-misir-yol",
-        baslik: "Antik Mısır - Piramit Dehlizi",
-        hedefHTML: "",
-        tur: "yol",
-        envPath: "assets/environment_pack_-_egypt_map/scene.gltf",
-        targetPath: null,
-        envOffset: { x: 0, y: 0, z: 0 },
-        envScale: 50,
-        charBaseY: 0
+        envOffset:  { x: 0, y: 0, z: 0 },
+        envScale:   18,
+        gridOffset: { x: 2.5, z: 1.5 }  // flat green zone (front-right) without falling off
     },
     {
         sinif: "tema-misir-oda",
-        baslik: "Antik Mısır - Firavun Odası",
+        baslik: "Antik Mısır - Piramit Dehlizi",
         hedefHTML: `⚱️`,
-        tur: "oda",
         envPath: "assets/environment_pack_-_egypt_map/scene.gltf",
         targetPath: null,
-        envOffset: { x: 0, y: 0, z: 0 },
-        envScale: 50,
-        charBaseY: 0
-    },
-    {
-        sinif: "tema-uzay-yol",
-        baslik: "Uzay İstasyonu - Güvenlik Koridoru",
-        hedefHTML: "",
-        tur: "yol",
-        envPath: "assets/mushrooms/scene.gltf",
-        targetPath: null,
-        envOffset: { x: 0, y: 0, z: 0 },
-        envScale: 35,
-        charBaseY: 0
+        envOffset:  { x: 0, y: 0, z: 0 },
+        envScale:   20,
+        gridOffset: null                   // auto-detect
     },
     {
         sinif: "tema-uzay-oda",
-        baslik: "Uzay İstasyonu - Ana Bilgisayar",
-        hedefHTML: `🖥️`,
-        tur: "oda",
+        baslik: "Mantar Dünyası - Karanlık Orman",
+        hedefHTML: `🍄`,
         envPath: "assets/mushrooms/scene.gltf",
         targetPath: null,
-        envOffset: { x: 0, y: 0, z: 0 },
-        envScale: 35,
-        charBaseY: 0
+        envOffset:  { x: 0, y: 0, z: 0 },
+        envScale:   16,
+        gridOffset: null
     }
 ];
 
@@ -194,67 +158,65 @@ const portalEnerji = document.getElementById("portal-enerji");
 function temayiGuncelle() {
     const aktifTema = temalar[window.mevcutTemaIndeksi];
     
-    if (aktifTema.tur === "yol") {
-        window.mevcutHedef = { x: 2, z: 4 }; 
-    } else {
-        window.mevcutHedef = { x: 2, z: 2 }; 
-    }
+    window.mevcutHedef = { x: 4, z: 4 };
 
     worldBg.className = aktifTema.sinif;
     
-    if(seviyeBaslik) seviyeBaslik.innerText = aktifTema.baslik;
+    if (seviyeBaslik) seviyeBaslik.innerText = aktifTema.baslik;
 
-    if(hedefNesnesi) {
+    if (hedefNesnesi) {
         hedefNesnesi.innerHTML = `<div class="hedef-animasyon">${aktifTema.hedefHTML}</div>`;
-        hedefNesnesi.className = "hedef-merkez"; 
-        
-        const hedefX = (window.mevcutHedef.x * 12) + 6;
-        const hedefY = -((window.mevcutHedef.z * 12) + 6);
-        hedefNesnesi.style.transform = `translate3d(${hedefX}vh, ${hedefY}vh, 0) translateX(-50%) rotateX(-65deg)`;
+        hedefNesnesi.className = "hedef-merkez";
     }
 
     const bipbopKapsayici = document.getElementById("bipbop-karekter-yani");
-    const diagKapsayici = document.getElementById("bipbop-diagnostics-icon");
+    const diagKapsayici   = document.getElementById("bipbop-diagnostics-icon");
     
     if (aktifTema.sinif.includes("misir")) {
         if (bipbopKapsayici) bipbopKapsayici.innerHTML = CHARACTER_ASSETS.DRAGON;
-        if (diagKapsayici) diagKapsayici.innerHTML = CHARACTER_ASSETS.DRAGON_HEAD;
+        if (diagKapsayici)   diagKapsayici.innerHTML   = CHARACTER_ASSETS.DRAGON_HEAD;
     } else {
         if (bipbopKapsayici) bipbopKapsayici.innerHTML = CHARACTER_ASSETS.ROBOT;
-        if (diagKapsayici) diagKapsayici.innerHTML = CHARACTER_ASSETS.ROBOT_HEAD;
+        if (diagKapsayici)   diagKapsayici.innerHTML   = CHARACTER_ASSETS.ROBOT_HEAD;
     }
 
     if (window.renderer3D) {
-        if (!window.renderer3D.renderer) {
+        if (!window.renderer3D._inited) {
             window.renderer3D.init("renderer-3d-viewport");
+            window.renderer3D._inited = true;
         }
         
         if (aktifTema.envPath) {
+            if (window.renderer3D.resetGridCentre) {
+                window.renderer3D.resetGridCentre();
+            }
             window.renderer3D.loadEnvironment(
-                aktifTema.envPath, 
-                aktifTema.envOffset || {x:0, y:0, z:0}, 
-                aktifTema.envScale || 30,
-                aktifTema.charBaseY || 0
-            );
-        }
-        
-        if (!window.renderer3D.character) {
-             window.renderer3D.loadCharacter("assets/character/scene.gltf");
-        }
-
-        if (!window.renderer3D.bipBop) {
-             window.renderer3D.loadBipBop("assets/space_maintenance_robot (1)/scene.gltf");
-        }
-
-        if (aktifTema.targetPath) {
-             window.renderer3D.loadTarget(aktifTema.targetPath);
+                aktifTema.envPath,
+                aktifTema.envOffset || { x: 0, y: 0, z: 0 },
+                aktifTema.envScale  || 16
+            ).then(() => {
+                // Apply manual grid offset after environment loads (matrices are ready)
+                if (aktifTema.gridOffset && window.renderer3D.setGridCentre) {
+                    window.renderer3D.setGridCentre(
+                        aktifTema.gridOffset.x,
+                        aktifTema.gridOffset.z
+                    );
+                }
+                if (!window.renderer3D.character) {
+                    window.renderer3D.loadCharacter("assets/character/scene.gltf");
+                }
+                if (!window.renderer3D.bipBop) {
+                    window.renderer3D.loadBipBop("assets/space_maintenance_robot (1)/scene.gltf");
+                }
+                if (aktifTema.targetPath) {
+                    window.renderer3D.loadTarget(aktifTema.targetPath);
+                }
+            });
         }
     }
     
     if (window.algoritmayiTemizle) {
         window.algoritmayiTemizle();
-    } else {
-        gorseliKonumlandir({x: 0, z: 0}, 0);
     }
 
     if (window.ambientManager) {
@@ -263,117 +225,82 @@ function temayiGuncelle() {
 }
 
 window.karakteriGuncelle = function(pos, rot) {
-    const yatayX = (pos.x * 12) + 6; 
-    const dikeyY = (pos.z * -12) - 6;
-
-    karakterKapsayici.style.transform = `translate3d(${yatayX}vh, ${dikeyY}vh, 0) rotateX(-65deg)`;
-    
     if (window.renderer3D && window.renderer3D.update) {
-        window.renderer3D.update(pos, -rot, window.mevcutHedef);
-    }
-    
-    const isMoving = window.engineState && (Math.abs(window.engineState.targetPos.x - pos.x) > 0.01 || Math.abs(window.engineState.targetPos.z - pos.z) > 0.01);
-    
-    if (isMoving) {
-        karakterKapsayici.classList.add("yuruyor");
-    } else {
-        karakterKapsayici.classList.remove("yuruyor");
+        window.renderer3D.update(pos, rot);
     }
 };
 
-window.sahneGuncelle = function(pos, dt) {
-    if (worldBg) {
-        const pxX = pos.x * 2;
-        const pxY = pos.z * 2;
-        worldBg.style.backgroundPosition = `calc(50% + ${-pxX}vh) calc(50% + ${pxY}vh)`;
-    }
-
-    const state = window.engineState;
-    if (state && (Math.abs(state.targetPos.x - state.currentPos.x) > 0.1 || Math.abs(state.targetPos.z - state.currentPos.z) > 0.1)) {
-        if (Math.random() < 0.2) {
-            const rect = karakterKapsayici.getBoundingClientRect();
-            window.createParticles(rect.left + rect.width / 2, rect.bottom - 20, '#ffffff22', 2, 'dust');
-        }
-    }
-    
-    const adimSayaci = document.getElementById("adim-sayaci");
-    if(adimSayaci) adimSayaci.innerText = `${Math.round(pos.z * 2) / 2} Adım`;
-};
+window.sahneGuncelle = function() {}; // 3D renderer handles all visuals now
 
 window.karakteri3DHareketEttir = function(pozisyon, aci) {
-    if (window.engineState) {
-        window.engineState.targetPos = {...pozisyon};
-        window.engineState.targetRot = aci;
+    window.karakteriGuncelle(pozisyon, aci);
+};
+
+
+window.basariEfektiOynat = function() {
+    const kutlamaUI = document.getElementById("kutlama-yazisi");
+    if (kutlamaUI) {
+        kutlamaUI.innerHTML = `
+            <div class="hologram-panel p-5 text-center shadow-lg" style="background: rgba(13, 13, 26, 0.95); border: 4px solid var(--secondary); border-radius: 30px;">
+                <h1 class="tebrikler-baslik mb-3">TEBRİKLER!</h1>
+                <p class="text-white fs-4 fw-bold">Zaman Parçasını Geri Kazandın!</p>
+                <div class="spinner-border text-secondary mt-3" role="status"></div>
+                <div class="text-secondary small mt-2 fw-black">BİR SONRAKİ ÇAĞA IŞINLANILIYOR...</div>
+            </div>
+        `;
+        kutlamaUI.classList.add("goster");
+        
+        if (hedefNesnesi) hedefNesnesi.classList.add("hedef-alindi");
+        if (portalEnerji) {
+            setTimeout(() => portalEnerji.classList.add("portal-aciliyor"), 1000);
+        }
+
+        window.screenShake('heavy');
+        if (hedefNesnesi) {
+            const rect = hedefNesnesi.getBoundingClientRect();
+            window.createParticles(rect.left + rect.width / 2, rect.top + rect.height / 2, '#ffd700', 40, 'sparkle');
+        }
+        
+        setTimeout(() => {
+            kutlamaUI.classList.remove("goster");
+            if (portalEnerji) portalEnerji.classList.remove("portal-aciliyor");
+            window.seviyeAtla();
+        }, 4000);
     }
 };
 
-function gorseliKonumlandir(pozisyon, aci) {
-    window.karakteriGuncelle(pozisyon, aci);
-}
-
-window.basariEfektiOynat = function() {
-    const kutlamaYazisi = document.getElementById("kutlama-yazisi");
-    if(kutlamaYazisi) kutlamaYazisi.classList.add("goster");
-
-    if(hedefNesnesi) hedefNesnesi.classList.add("hedef-alindi");
+window.seviyeAtla = function() {
+    const flash = document.getElementById("gecis-flas");
+    if (flash) {
+        flash.classList.add("gecis-aktif");
+    }
 
     setTimeout(() => {
-        if(portalEnerji) portalEnerji.classList.add("portal-aciliyor");
-    }, 1000);
-
-    setTimeout(() => {
-        seviyeAtla();
-    }, 3000);
-
-    window.screenShake('heavy');
-    const rect = hedefNesnesi.getBoundingClientRect();
-    window.createParticles(rect.left + rect.width / 2, rect.top + rect.height / 2, '#ffd700', 40, 'sparkle');
-};
-
-window.hataSesiCal = function() {
-    const alarm = document.getElementById("alarm-filtresi");
-    if(alarm) alarm.classList.add("aktif");
-    
-    const glassPaneller = document.querySelectorAll(".glass-panel");
-    glassPaneller.forEach(panel => {
-        panel.style.transform = "translateX(-10px)";
-        setTimeout(() => panel.style.transform = "translateX(10px)", 100);
-        setTimeout(() => panel.style.transform = "translateX(-10px)", 200);
-        setTimeout(() => panel.style.transform = "translateX(0)", 300);
-    });
-
-    setTimeout(() => {
-        if(alarm) alarm.classList.remove("aktif");
-    }, 1000);
-
-    window.screenShake('heavy'); 
-    const rect = karakterKapsayici.getBoundingClientRect();
-    window.createParticles(rect.left + rect.width/2, rect.top + rect.height/2, '#ff4d6d', 25, 'sparkle');
-};
-
-function seviyeAtla() {
-    const flas = document.getElementById("gecis-flas");
-    if(flas) flas.classList.add("gecis-aktif");
-
-    setTimeout(() => {
-        const kutlamaYazisi = document.getElementById("kutlama-yazisi");
-        if(kutlamaYazisi) kutlamaYazisi.classList.remove("goster");
-        if(portalEnerji) portalEnerji.classList.remove("portal-aciliyor");
-        
         window.mevcutTemaIndeksi++;
         if (window.mevcutTemaIndeksi >= temalar.length) {
             window.mevcutTemaIndeksi = 0; 
-            if(window.oyunuTamamla) window.oyunuTamamla();
+            if(window.oyunuTamamla) {
+                window.oyunuTamamla();
+                return;
+            }
+        }
+        
+        if (window.renderer3D) {
+            window.renderer3D.clearEra();
         }
 
         temayiGuncelle();
+        
+        if (window.bipBopMesajYaz) {
+            window.bipBopMesajYaz("Işınlanma tamamlandı! Yeni bir çağdayız.", "var(--tertiary)");
+        }
 
         setTimeout(() => {
-            if(flas) flas.classList.remove("gecis-aktif");
+            if (flash) flash.classList.remove("gecis-aktif");
         }, 500);
 
-    }, 1000); 
-}
+    }, 1000);
+};
 
 document.addEventListener('DOMContentLoaded', () => {
     const btnBasla = document.getElementById("btn-oyuna-basla");
@@ -411,51 +338,37 @@ document.addEventListener('DOMContentLoaded', () => {
 
 window.oyunuTamamla = function() {
     const bitisEkrani = document.getElementById("oyun-sonu-ekrani");
-    if(bitisEkrani) {
-        bitisEkrani.style.setProperty('display', 'flex', 'important');
+    if (!bitisEkrani) return;
+
+    bitisEkrani.style.setProperty('display', 'flex', 'important');
+    
+    setTimeout(() => {
+        bitisEkrani.style.setProperty('display', 'none', 'important');
+        document.getElementById("baslangic-ekrani").classList.remove("gizle");
         
-        setTimeout(() => {
-            bitisEkrani.style.setProperty('display', 'none', 'important');
-            document.getElementById("baslangic-ekrani").classList.remove("gizle");
-            
-            if (window.bulmacayiSifirla) window.bulmacayiSifirla(); 
-            aktifTemaIndeksi = 0;
-            
-            if(window.temizle) {
-                window.temizle();
-            } else {
-                karakteriBaslangicaAl();
-            }
-            
-            temayiGuncelle();
-        }, 7000);
-    }
+        if (window.bulmacayiSifirla) window.bulmacayiSifirla();
+        window.mevcutTemaIndeksi = 0;
+        window.mevcutSeviyeIndeksi = 0;
+        
+        if (window.algoritmayiTemizle) window.algoritmayiTemizle();
+        temayiGuncelle();
+    }, 7000);
 };
 
 window.hedefeUlasildiTetikle = function() {
-    const aktifTema = temalar[mevcutTemaIndeksi];
+    document.getElementById("bipbop-mesaj").innerText = "🤖: MÜKEMMEL! Gizemli objeye ulaştık, inceliyorum...";
     
-    if (aktifTema.tur === "yol") {
-        document.getElementById("bipbop-mesaj").innerText = "🤖: Harika! Kapıya ulaştık, diğer odaya geçiyoruz.";
-        setTimeout(() => {
-            window.mevcutTemaIndeksi++;
-            temayiGuncelle();
-        }, 1500);
-    } else {
-        document.getElementById("bipbop-mesaj").innerText = "🤖: MÜKEMMEL! Gizemli objeye ulaştık, inceliyorum...";
-        
-        const ikonObjesi = document.querySelector("#hedef-nesnesi .hedef-animasyon");
-        if(ikonObjesi) {
-            ikonObjesi.classList.add("obje-patla");
-        }
-        
-        setTimeout(() => {
-            if (window.soruEkraniAc) {
-                window.soruEkraniAc();
-            }
-            if(ikonObjesi) ikonObjesi.classList.remove("obje-patla");
-        }, 1500);
+    const ikonObjesi = document.querySelector("#hedef-nesnesi .hedef-animasyon");
+    if(ikonObjesi) {
+        ikonObjesi.classList.add("obje-patla");
     }
+    
+    setTimeout(() => {
+        if (window.soruEkraniAc) {
+            window.soruEkraniAc();
+        }
+        if(ikonObjesi) ikonObjesi.classList.remove("obje-patla");
+    }, 1500);
 };
 
 window.temaIlerlet = function() {
@@ -465,41 +378,23 @@ window.temaIlerlet = function() {
     }
 };
 
-window.basariEfektiOynat = function() {
-    const kutlamaUI = document.getElementById("kutlama-yazisi");
-    if (kutlamaUI) {
-        kutlamaUI.innerHTML = `
-            <div class="hologram-panel p-5 text-center shadow-lg" style="background: rgba(13, 13, 26, 0.95); border: 4px solid var(--secondary); border-radius: 30px;">
-                <h1 class="tebrikler-baslik mb-3">TEBRİKLER!</h1>
-                <p class="text-white fs-4 fw-bold">Zaman Parçasını Geri Kazandın!</p>
-                <div class="spinner-border text-secondary mt-3" role="status"></div>
-                <div class="text-secondary small mt-2 fw-black">BİR SONRAKİ ÇAĞA IŞINLANILIYOR...</div>
-            </div>
-        `;
-        kutlamaUI.classList.add("goster");
-        
-        setTimeout(() => {
-            kutlamaUI.classList.remove("goster");
-            window.seviyeAtla();
-        }, 4000);
-    }
-};
-
-window.seviyeAtla = function() {
-    const flash = document.getElementById("gecis-flas");
-    if (flash) {
-        flash.classList.add("gecis-aktif");
-        setTimeout(() => flash.classList.remove("gecis-aktif"), 1500);
-    }
-
-    window.mevcutTemaIndeksi++;
+window.hataSesiCal = function() {
+    const alarm = document.getElementById("alarm-filtresi");
+    if(alarm) alarm.classList.add("aktif");
     
-    if (window.renderer3D) {
-        window.renderer3D.clearEra();
-        window.temayiGuncelle();
-    }
-    
-    if (window.bipBopMesajYaz) {
-        window.bipBopMesajYaz("Işınlanma tamamlandı! Yeni bir çağdayız.", "var(--tertiary)");
-    }
+    const glassPaneller = document.querySelectorAll(".glass-panel");
+    glassPaneller.forEach(panel => {
+        panel.style.transform = "translateX(-10px)";
+        setTimeout(() => panel.style.transform = "translateX(10px)", 100);
+        setTimeout(() => panel.style.transform = "translateX(-10px)", 200);
+        setTimeout(() => panel.style.transform = "translateX(0)", 300);
+    });
+
+    setTimeout(() => {
+        if(alarm) alarm.classList.remove("aktif");
+    }, 1000);
+
+    window.screenShake('heavy'); 
+    const rect = karakterKapsayici.getBoundingClientRect();
+    window.createParticles(rect.left + rect.width/2, rect.top + rect.height/2, '#ff4d6d', 25, 'sparkle');
 };

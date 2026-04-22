@@ -1,320 +1,393 @@
-window.renderer3D = {
-    scene: null,
-    camera: null,
-    renderer: null,
-    clock: new THREE.Clock(),
-    
-    environment: null,
-    character: null,
-    bipBop: null,
-    target: null,
-    shadowDisc: null,
-    hologrid: null,
-    controls: null,
-    charHeight: 0,
-    
-    mixers: [],
-    
-    gridScale: 2.0, 
-    
-    init(containerId) {
-        const container = document.getElementById(containerId);
-        if (!container) return;
+/**
+ * renderer3D.js - Clean 3D scene manager
+ * Grid: 5x5 cells, terrain-hugging holographic lines
+ * Character sits flush on terrain surface, BipBop floats to the right
+ */
+window.renderer3D = (function () {
 
-        this.scene = new THREE.Scene();
-        
-        this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-        this.renderer.setPixelRatio(window.devicePixelRatio);
-        this.renderer.setSize(container.clientWidth, container.clientHeight);
-        this.renderer.outputEncoding = THREE.sRGBEncoding;
-        container.appendChild(this.renderer.domElement);
+    // ── Private raycaster (reused, never re-created) ──────────────────────────
+    const _rc  = new THREE.Raycaster();
+    const _dn  = new THREE.Vector3(0, -1, 0);
 
-        this.camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
-        this.camera.position.set(0, 6, 12); 
-        this.camera.lookAt(0, 0, 0);
+    // ── Grid constants ────────────────────────────────────────────────────────
+    const COLS      = 5;
+    const ROWS      = 5;
+    const CELL      = 0.9;        // small cells so grid fits on flat zone
+    const INTERP    = 20;
+    const SCAN_R    = 10;
+    const SCAN_STEP = 0.4;
 
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
-        this.scene.add(ambientLight);
+    // ── Module state ─────────────────────────────────────────────────────────
+    let scene, camera, renderer, clock, controls;
+    let environment = null;
+    let character   = null;
+    let bipBop      = null;
+    let target      = null;
+    let shadowDisc  = null;
+    let hologrid    = null;
 
-        const dirLight = new THREE.DirectionalLight(0xffffff, 1.0);
-        dirLight.position.set(10, 20, 10);
-        this.scene.add(dirLight);
+    let envMixers  = [];
+    let charMixers = [];
 
-        this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
-        this.controls.enableDamping = true;
-        this.controls.dampingFactor = 0.05;
-        this.controls.maxPolarAngle = Math.PI / 2.1;
-        this.controls.minDistance = 5;
-        this.controls.maxDistance = 20;
+    let gridCX = 0, gridCZ = 0;    // current grid centre (world space)
+    let gridManual = false;         // true = use manually set centre, skip auto-detect
 
-        this.createHologrid();
+    // Target tracking for smooth movement
+    let targetPos = new THREE.Vector3(0, 0, 0);
+    let targetRotY = 0;
+    let hoverY = 0;
 
-        const shadowGeo = new THREE.CircleGeometry(0.8, 32);
-        const shadowMat = new THREE.MeshBasicMaterial({ 
-            color: 0x000000, 
-            transparent: true, 
-            opacity: 0.4,
-            side: THREE.DoubleSide 
-        });
-        this.shadowDisc = new THREE.Mesh(shadowGeo, shadowMat);
-        this.shadowDisc.rotation.x = Math.PI / 2;
-        this.shadowDisc.position.y = 0.02; 
-        this.scene.add(this.shadowDisc);
+    // ── Helpers ───────────────────────────────────────────────────────────────
 
-        this.animate();
-        
-        window.addEventListener('resize', () => this.onResize(container));
-    },
-
-    createHologrid() {
-        if (this.hologrid) this.scene.remove(this.hologrid);
-        
-        const gridGroup = new THREE.Group();
-        const size = 5 * this.gridScale;
-        const detail = 5;
-        
-        const planeGeo = new THREE.PlaneGeometry(size, size);
-        const planeMat = new THREE.MeshBasicMaterial({ 
-            color: 0x9eff00, 
-            transparent: true, 
-            opacity: 0.05, 
-            side: THREE.DoubleSide 
-        });
-        const plane = new THREE.Mesh(planeGeo, planeMat);
-        plane.rotation.x = Math.PI / 2;
-        gridGroup.add(plane);
-
-        const lineMat = new THREE.LineBasicMaterial({ color: 0x9eff00, transparent: true, opacity: 0.3 });
-        for(let i=0; i<=detail; i++) {
-            const offset = (i / detail - 0.5) * size;
-            
-            const pointsX = [new THREE.Vector3(offset, 0.01, -size/2), new THREE.Vector3(offset, 0.01, size/2)];
-            const geoX = new THREE.BufferGeometry().setFromPoints(pointsX);
-            gridGroup.add(new THREE.Line(geoX, lineMat));
-
-            const pointsZ = [new THREE.Vector3(-size/2, 0.01, offset), new THREE.Vector3(size/2, 0.01, offset)];
-            const geoZ = new THREE.BufferGeometry().setFromPoints(pointsZ);
-            gridGroup.add(new THREE.Line(geoZ, lineMat));
-        }
-
-        this.hologrid = gridGroup;
-        this.scene.add(this.hologrid);
-    },
-
-    onResize(container) {
-        if (!this.camera || !this.renderer) return;
-        const width = container.clientWidth;
-        const height = container.clientHeight;
-        this.camera.aspect = width / height;
-        this.camera.updateProjectionMatrix();
-        this.renderer.setSize(width, height);
-    },
-
-    clearEra() {
-        if (this.environment) this.scene.remove(this.environment);
-        if (this.target) this.scene.remove(this.target);
-        this.mixers = [];
-    },
-
-    async loadEnvironment(path, offset = {x:0, y:0, z:0}, customScale = 30, charHeight = 0, targetPath = null) {
-        this.clearEra();
-        this.charHeight = charHeight;
-        const loader = new THREE.GLTFLoader();
-        
-        const envPromise = new Promise((resolve) => {
-            loader.load(path, (gltf) => {
-                this.environment = gltf.scene;
-                const box = new THREE.Box3().setFromObject(this.environment);
-                const center = box.getCenter(new THREE.Vector3());
-                const size = box.getSize(new THREE.Vector3());
-                
-                this.environment.position.x -= center.x;
-                this.environment.position.z -= center.z;
-                this.environment.position.y -= box.min.y;
-                
-                this.environment.position.x += offset.x;
-                this.environment.position.y += offset.y;
-                this.environment.position.z += offset.z;
-                
-                const maxDim = Math.max(size.x, size.z);
-                const scale = customScale / maxDim; 
-                this.environment.scale.set(scale, scale, scale);
-                
-                this.scene.add(this.environment);
-                
-                if (gltf.animations && gltf.animations.length > 0) {
-                    const mixer = new THREE.AnimationMixer(this.environment);
-                    gltf.animations.forEach(clip => mixer.clipAction(clip).play());
-                    this.mixers.push(mixer);
-                }
-                resolve();
-            });
-        });
-
-        const targetPromise = targetPath ? new Promise((resolve) => {
-            loader.load(targetPath, (gltf) => {
-                this.target = gltf.scene;
-                this.target.scale.set(1.5, 1.5, 1.5);
-                
-                const gridX = 2; 
-                const gridZ = 2; 
-                const worldX = (gridX - 2) * this.gridScale;
-                const worldZ = (gridZ - 2) * this.gridScale;
-                
-                this.target.position.set(worldX, this.charHeight + 0.1, worldZ);
-                this.scene.add(this.target);
-
-                if (gltf.animations && gltf.animations.length > 0) {
-                    const mixer = new THREE.AnimationMixer(this.target);
-                    gltf.animations.forEach(clip => mixer.clipAction(clip).play());
-                    this.mixers.push(mixer);
-                }
-                resolve();
-            });
-        }) : Promise.resolve();
-
-        return Promise.all([envPromise, targetPromise]);
-    },
-
-    async loadCharacter(path) {
-        if (this.character) this.scene.remove(this.character);
-        const loader = new THREE.GLTFLoader();
-        
-        return new Promise((resolve) => {
-            loader.load(path, (gltf) => {
-                this.character = gltf.scene;
-                this.character.scale.set(1.5, 1.5, 1.5); 
-                this.scene.add(this.character);
-                
-                if (gltf.animations && gltf.animations.length > 0) {
-                    const mixer = new THREE.AnimationMixer(this.character);
-                    mixer.clipAction(gltf.animations[0]).play();
-                    this.mixers.push(mixer);
-                }
-                resolve();
-            });
-        });
-    },
-
-    async loadBipBop(path) {
-        if (this.bipBop) this.scene.remove(this.bipBop);
-        const loader = new THREE.GLTFLoader();
-        
-        return new Promise((resolve) => {
-            loader.load(path, (gltf) => {
-                this.bipBop = gltf.scene;
-                this.bipBop.scale.set(0.8, 0.8, 0.8); 
-                this.scene.add(this.bipBop);
-                
-                if (gltf.animations && gltf.animations.length > 0) {
-                    const mixer = new THREE.AnimationMixer(this.bipBop);
-                    mixer.clipAction(gltf.animations[0]).play();
-                    this.mixers.push(mixer);
-                }
-                resolve();
-            });
-        });
-    },
-
-    async loadTarget(path) {
-        if (this.target) this.scene.remove(this.target);
-        const loader = new THREE.GLTFLoader();
-        
-        return new Promise((resolve) => {
-            loader.load(path, (gltf) => {
-                this.target = gltf.scene;
-                this.target.scale.set(1.5, 1.5, 1.5);
-                
-                const gridX = 2;
-                const gridZ = 2;
-                const worldX = (gridX - 2) * this.gridScale;
-                const worldZ = (gridZ - 2) * this.gridScale;
-                
-                this.target.position.set(worldX, this.charHeight + 0.1, worldZ);
-                this.scene.add(this.target);
-                
-                if (gltf.animations && gltf.animations.length > 0) {
-                    const mixer = new THREE.AnimationMixer(this.target);
-                    gltf.animations.forEach(clip => mixer.clipAction(clip).play());
-                    this.mixers.push(mixer);
-                }
-                resolve();
-            });
-        });
-    },
-
-    raycaster: new THREE.Raycaster(),
-    rayDown: new THREE.Vector3(0, -1, 0),
-    currentHoverY: 2.0,
-
-    update(pos, rot, targetPos) {
-        if (this.character) {
-            const worldX = (pos.x - 2) * this.gridScale;
-            const worldZ = (pos.z - 2) * this.gridScale;
-            
-            let groundY = this.charHeight;
-            
-            if (this.environment) {
-                const rayOrigin = new THREE.Vector3(worldX, 20, worldZ);
-                this.raycaster.set(rayOrigin, this.rayDown);
-                
-                const intersects = this.raycaster.intersectObject(this.environment, true);
-                if (intersects.length > 0) {
-                    groundY = intersects[0].point.y;
-                }
-            }
-
-            const targetY = groundY + 0.02;
-
-            this.currentHoverY += (targetY - this.character.position.y) * 0.15;
-
-            this.character.position.set(worldX, this.currentHoverY, worldZ); 
-            
-            this.character.rotation.y = THREE.MathUtils.degToRad(rot); 
-            
-            if (this.shadowDisc) {
-                this.shadowDisc.position.set(worldX, groundY + 0.05, worldZ);
-            }
-
-            this.controls.target.lerp(new THREE.Vector3(worldX, this.currentHoverY + 0.5, worldZ), 0.1);
-        }
-
-        if (this.bipBop && this.character) {
-            const hoverHeight = 1.0 + Math.sin(Date.now() * 0.003) * 0.2;
-            const targetX = this.character.position.x - Math.sin(this.character.rotation.y) * 1.5;
-            const targetZ = this.character.position.z - Math.cos(this.character.rotation.y) * 1.5;
-            const targetY = this.character.position.y + hoverHeight;
-            
-            this.bipBop.position.lerp(new THREE.Vector3(targetX, targetY, targetZ), 0.08);
-            this.bipBop.lookAt(this.character.position);
-        }
-
-        if (this.target && this.environment) {
-            const gridGoalX = 2;
-            const gridGoalZ = 2;
-            const tX = (gridGoalX - 2) * this.gridScale;
-            const tZ = (gridGoalZ - 2) * this.gridScale;
-            
-            const rayOrigin = new THREE.Vector3(tX, 20, tZ);
-            this.raycaster.set(rayOrigin, this.rayDown);
-            const intersects = this.raycaster.intersectObject(this.environment, true);
-            let groundT = this.charHeight;
-            if (intersects.length > 0) groundT = intersects[0].point.y;
-
-            this.target.position.set(tX, groundT, tZ);
-            this.target.rotation.y += 0.01; 
-        }
-    },
-
-    animate() {
-        requestAnimationFrame(() => this.animate());
-        
-        const delta = this.clock.getDelta();
-        this.mixers.forEach(mixer => mixer.update(delta));
-        if (this.controls) this.controls.update();
-        
-        if (this.renderer && this.scene && this.camera) {
-            this.renderer.render(this.scene, this.camera);
-        }
+    /** Sample the highest terrain point at world (wx, wz). Returns Y or null. */
+    function sampleY(wx, wz) {
+        if (!environment) return null;
+        _rc.set(new THREE.Vector3(wx, 60, wz), _dn);
+        const hits = _rc.intersectObject(environment, true);
+        if (!hits.length) return null;
+        // Highest surface (sort desc by Y)
+        let maxY = -Infinity;
+        for (const h of hits) if (h.point.y > maxY) maxY = h.point.y;
+        return maxY;
     }
-};
+
+    /** Convert grid cell indices to world XZ (col/row can be fractional for interpolation). */
+    function cellToWorld(col, row) {
+        const halfW = (COLS - 1) * CELL / 2;
+        const halfH = (ROWS - 1) * CELL / 2;
+        return {
+            x: gridCX + col * CELL - halfW,
+            z: gridCZ + row * CELL - halfH
+        };
+    }
+
+    /** Scan terrain to find the elevated plateau's centre of mass.
+     *  If gridManual=true, skip scan and keep the manually set centre. */
+    function detectGridCentre() {
+        if (gridManual) return;   // manual offset already set, trust it
+
+        environment.updateMatrixWorld(true);
+
+        let maxY = -Infinity;
+        for (let x = -SCAN_R; x <= SCAN_R; x += SCAN_STEP) {
+            for (let z = -SCAN_R; z <= SCAN_R; z += SCAN_STEP) {
+                const y = sampleY(x, z);
+                if (y !== null && y > maxY) maxY = y;
+            }
+        }
+
+        // Use only the flattest, highest zone (top 40%) to avoid mountains
+        const thresh = maxY * 0.6;
+        let sx = 0, sz = 0, n = 0;
+        for (let x = -SCAN_R; x <= SCAN_R; x += SCAN_STEP) {
+            for (let z = -SCAN_R; z <= SCAN_R; z += SCAN_STEP) {
+                const y = sampleY(x, z);
+                if (y !== null && y >= thresh) { sx += x; sz += z; n++; }
+            }
+        }
+        gridCX = n ? sx / n : 0;
+        gridCZ = n ? sz / n : 0;
+    }
+
+    /** Build terrain-hugging holographic grid and add to scene. */
+    function buildGrid() {
+        if (hologrid) { scene.remove(hologrid); hologrid = null; }
+        if (!environment) return;
+
+        detectGridCentre();
+
+        const group = new THREE.Group();
+        const mat   = new THREE.LineBasicMaterial({ color: 0x9eff00, transparent: true, opacity: 0.8 });
+        const steps = COLS * INTERP;
+
+        function makeLine(pts) {
+            if (pts.length < 2) return;
+            group.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), mat));
+        }
+
+        // Horizontal lines (row constant), broken at voids
+        for (let row = 0; row <= ROWS; row++) {
+            let seg = [];
+            for (let s = 0; s <= steps; s++) {
+                const wp = cellToWorld(s / INTERP, row);
+                const y  = sampleY(wp.x, wp.z);
+                if (y !== null) {
+                    seg.push(new THREE.Vector3(wp.x, y + 0.07, wp.z));
+                } else {
+                    makeLine(seg); seg = [];
+                }
+            }
+            makeLine(seg);
+        }
+
+        // Vertical lines (col constant), broken at voids
+        for (let col = 0; col <= COLS; col++) {
+            let seg = [];
+            for (let s = 0; s <= steps; s++) {
+                const wp = cellToWorld(col, s / INTERP);
+                const y  = sampleY(wp.x, wp.z);
+                if (y !== null) {
+                    seg.push(new THREE.Vector3(wp.x, y + 0.07, wp.z));
+                } else {
+                    makeLine(seg); seg = [];
+                }
+            }
+            makeLine(seg);
+        }
+
+        hologrid = group;
+        scene.add(hologrid);
+    }
+
+    /** Place target on terrain surface at its designated cell. */
+    function placeTarget() {
+        if (!target) return;
+        const hedef = window.mevcutHedef || { x: COLS - 1, z: ROWS - 1 };
+        const wp    = cellToWorld(hedef.x, hedef.z);
+        const y     = sampleY(wp.x, wp.z) ?? 0;
+        target.position.set(wp.x, y, wp.z);
+    }
+
+    /** Load a GLTF model, return a Promise<THREE.Group>. */
+    function loadGLTF(path, onMixer) {
+        return new Promise((resolve, reject) => {
+            new THREE.GLTFLoader().load(path, gltf => {
+                if (gltf.animations?.length && onMixer) {
+                    const mx = new THREE.AnimationMixer(gltf.scene);
+                    gltf.animations.forEach(c => mx.clipAction(c).play());
+                    onMixer(mx);
+                }
+                resolve(gltf.scene);
+            }, undefined, reject);
+        });
+    }
+
+    /** Normalise a mesh so its bottom sits exactly at y=0 of its parent group. */
+    function floorPivot(mesh) {
+        const box = new THREE.Box3().setFromObject(mesh);
+        mesh.position.y -= box.min.y;
+    }
+
+    // ── Public API ────────────────────────────────────────────────────────────
+    const api = {
+
+        // Expose references needed by sahne.js
+        get gridCols()  { return COLS; },
+        get gridRows()  { return ROWS; },
+        get character() { return character; },
+        get bipBop()    { return bipBop; },
+        get target()    { return target; },
+
+        /** Manually fix the grid centre to a specific world XZ point.
+         *  Call BEFORE loadEnvironment or right after for instant effect. */
+        setGridCentre(wx, wz) {
+            gridCX = wx;
+            gridCZ = wz;
+            gridManual = true;
+            buildGrid();
+            placeTarget();
+        },
+
+        /** Re-enable auto-detection for the next era. */
+        resetGridCentre() {
+            gridManual = false;
+            gridCX = 0;
+            gridCZ = 0;
+        },
+
+        init(containerId) {
+            const container = document.getElementById(containerId);
+            if (!container || renderer) return; // Don't re-init
+
+            scene    = new THREE.Scene();
+            clock    = new THREE.Clock();
+
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            renderer.outputEncoding = THREE.sRGBEncoding;
+            container.appendChild(renderer.domElement);
+
+            camera = new THREE.PerspectiveCamera(50, container.clientWidth / container.clientHeight, 0.1, 500);
+            camera.position.set(0, 12, 18);
+            camera.lookAt(0, 0, 0);
+
+            scene.add(new THREE.AmbientLight(0xffffff, 0.65));
+            const dir = new THREE.DirectionalLight(0xffffff, 1.0);
+            dir.position.set(10, 20, 10);
+            scene.add(dir);
+
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping   = true;
+            controls.dampingFactor   = 0.06;
+            controls.maxPolarAngle   = Math.PI / 2.1;
+            controls.minDistance     = 6;
+            controls.maxDistance     = 22;
+
+            // Shadow disc for character
+            const sGeo = new THREE.CircleGeometry(0.7, 32);
+            const sMat = new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.28, side: THREE.DoubleSide });
+            shadowDisc = new THREE.Mesh(sGeo, sMat);
+            shadowDisc.rotation.x = -Math.PI / 2;
+            scene.add(shadowDisc);
+
+            this._loop();
+
+            window.addEventListener('resize', () => {
+                if (!camera || !renderer) return;
+                camera.aspect = container.clientWidth / container.clientHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(container.clientWidth, container.clientHeight);
+            });
+        },
+
+        /** Remove era-specific objects, keep character & bipbop. */
+        clearEra() {
+            if (environment) { scene.remove(environment); environment = null; }
+            if (target)      { scene.remove(target);      target = null; }
+            if (hologrid)    { scene.remove(hologrid);    hologrid = null; }
+            envMixers = [];
+        },
+
+        async loadEnvironment(path, offset = { x: 0, y: 0, z: 0 }, scale = 30) {
+            this.clearEra();
+
+            const mesh = await loadGLTF(path, mx => envMixers.push(mx));
+
+            // Get raw (unscaled) bbox to compute scale factor
+            const rawBox  = new THREE.Box3().setFromObject(mesh);
+            const rawSize = rawBox.getSize(new THREE.Vector3());
+            const s = scale / Math.max(rawSize.x, rawSize.z);
+            mesh.scale.set(s, s, s);
+            mesh.updateMatrixWorld(true);
+
+            // Now re-read bbox in scaled space and floor+centre
+            const scaledBox    = new THREE.Box3().setFromObject(mesh);
+            const scaledCentre = scaledBox.getCenter(new THREE.Vector3());
+
+            const group = new THREE.Group();
+            mesh.position.set(-scaledCentre.x, -scaledBox.min.y, -scaledCentre.z);
+            group.position.set(offset.x, offset.y, offset.z);
+            group.add(mesh);
+
+            environment = group;
+            scene.add(environment);
+            environment.updateMatrixWorld(true);
+
+            buildGrid();
+            placeTarget();
+            hoverY = 0;
+        },
+
+        async loadCharacter(path) {
+            if (character) { scene.remove(character); character = null; }
+
+            const mesh = await loadGLTF(path, mx => charMixers.push(mx));
+            mesh.scale.set(1.5, 1.5, 1.5);
+            mesh.rotation.y = 0; // Modelin doğal yüzü +Z eksenine bakacak
+            floorPivot(mesh);
+
+            const group = new THREE.Group();
+            group.add(mesh);
+
+            const wp = cellToWorld(0, 0);
+            const y  = sampleY(wp.x, wp.z) ?? 0;
+            group.position.set(wp.x, y, wp.z);
+            hoverY = y;
+            targetPos.set(wp.x, y, wp.z);
+            targetRotY = group.rotation.y;
+
+            character = group;
+            scene.add(character);
+        },
+
+        async loadBipBop(path) {
+            if (bipBop) { scene.remove(bipBop); bipBop = null; }
+
+            const mesh = await loadGLTF(path, mx => charMixers.push(mx));
+            mesh.scale.set(0.8, 0.8, 0.8);
+            floorPivot(mesh);
+
+            // Start offset so it doesn't overlap character on first frame
+            const wp = cellToWorld(0, 0);
+            const y  = sampleY(wp.x, wp.z) ?? 0;
+            mesh.position.set(wp.x + 2.2, y + 1.8, wp.z);
+
+            bipBop = mesh;
+            scene.add(bipBop);
+        },
+
+        async loadTarget(path) {
+            if (target) { scene.remove(target); target = null; }
+
+            const mesh = await loadGLTF(path, mx => envMixers.push(mx));
+            mesh.scale.set(1.5, 1.5, 1.5);
+            floorPivot(mesh);
+
+            const group = new THREE.Group();
+            group.add(mesh);
+            target = group;
+            scene.add(target);
+
+            placeTarget();
+        },
+
+        /**
+         * Called every frame from sahne.js.
+         * pos = { x: col, z: row } in grid space
+         * rot = degrees (Y rotation)
+         */
+        update(pos, rot) {
+            if (!character) return;
+            const wp      = cellToWorld(pos.x, pos.z);
+            const groundY = sampleY(wp.x, wp.z) ?? 0;
+            
+            targetPos.set(wp.x, groundY, wp.z);
+            targetRotY = THREE.MathUtils.degToRad(rot);
+        },
+
+        _loop() {
+            requestAnimationFrame(() => this._loop());
+            const dt = clock.getDelta();
+            
+            // Continuous smooth tracking for animations
+            if (character) {
+                // Smooth vertical snapping to terrain independently
+                hoverY += (targetPos.y - hoverY) * 0.15;
+                
+                // Lerp Character X/Z and Y
+                character.position.lerp(new THREE.Vector3(targetPos.x, hoverY, targetPos.z), 0.15);
+                
+                // Lerp Rotation (handle angle wrapping)
+                let diff = targetRotY - character.rotation.y;
+                while (diff < -Math.PI) diff += Math.PI * 2;
+                while (diff > Math.PI)  diff -= Math.PI * 2;
+                character.rotation.y += diff * 0.15;
+
+                // Sync shadow and camera
+                if (shadowDisc) shadowDisc.position.set(character.position.x, targetPos.y + 0.04, character.position.z);
+                if (controls) controls.target.lerp(new THREE.Vector3(character.position.x, hoverY + 0.5, character.position.z), 0.08);
+
+                // BipBop floats to the character's RIGHT side continuously
+                if (bipBop) {
+                    const rightAngle = character.rotation.y + Math.PI / 2;
+                    const bx = character.position.x + Math.sin(rightAngle) * 1.8;
+                    const bz = character.position.z + Math.cos(rightAngle) * 1.8;
+                    const by = hoverY + 1.35 + Math.sin(Date.now() * 0.003) * 0.18;
+
+                    bipBop.position.lerp(new THREE.Vector3(bx, by, bz), 0.1);
+                    bipBop.lookAt(new THREE.Vector3(character.position.x, hoverY + 0.6, character.position.z));
+                }
+            }
+
+            if (target) target.rotation.y += 0.016;
+
+            envMixers.forEach(m  => m.update(dt));
+            charMixers.forEach(m => m.update(dt));
+            controls?.update();
+            renderer?.render(scene, camera);
+        }
+    };
+
+    return api;
+})();
