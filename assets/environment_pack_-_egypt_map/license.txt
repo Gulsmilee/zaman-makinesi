@@ -1,0 +1,11 @@
+Model Information:
+* title:	Environment Pack - Egypt Map
+* source:	https://sketchfab.com/3d-models/environment-pack-egypt-map-3049b31b9aba4f6d94345573be670aca
+* author:	PolyOne Studio (https://sketchfab.com/polyone)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Environment Pack - Egypt Map" (https://sketchfab.com/3d-models/environment-pack-egypt-map-3049b31b9aba4f6d94345573be670aca) by PolyOne Studio (https://sketchfab.com/polyone) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
