@@ -138,13 +138,13 @@ const CHARACTER_ASSETS = {
     {
         sinif: "tema-uzay-oda",
         baslik: "Mantar Dünyası - Karanlık Orman",
-        hedefHTML: `🍄`,
+        hedefHTML: `👽`,
         envPath: "assets/mushrooms/scene.gltf",
         targetPath: null,
         envOffset:  { x: 0, y: 0, z: 0 },
-        envScale:   120, // Increased scale to fix tiny island
-        gridOffset: null,
-        rayY: 12,
+        envScale:   120,
+        gridOffset: { x: 0, z: 0 },   // model floors at origin, land is there
+        rayY: 80,
         hideDome: true,
         ambientColor: 0x5588ff,
         ambientIntensity: 0.5,
@@ -220,12 +220,9 @@ function temayiGuncelle() {
                         aktifTema.gridOffset.z
                     );
                 }
-                if (!window.renderer3D.character) {
-                    window.renderer3D.loadCharacter("assets/character/scene.gltf");
-                }
-                if (!window.renderer3D.bipBop) {
-                    window.renderer3D.loadBipBop("assets/space_maintenance_robot (1)/scene.gltf");
-                }
+                // Always reload character & bipBop so they reposition on new terrain
+                window.renderer3D.loadCharacter("assets/character/scene.gltf");
+                window.renderer3D.loadBipBop("assets/space_maintenance_robot (1)/scene.gltf");
                 if (aktifTema.targetPath) {
                     window.renderer3D.loadTarget(aktifTema.targetPath);
                 }
