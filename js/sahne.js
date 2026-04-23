@@ -327,29 +327,60 @@ document.addEventListener('DOMContentLoaded', () => {
     
     if(btnBasla) {
         btnBasla.addEventListener("click", () => {
-            window.screenShake('light');
-            
-            baslangicEkrani.classList.add("gizle");
-            
-            uiLayer.classList.remove("d-none");
-            
-            const flas = document.getElementById("gecis-flas");
-            if(flas) flas.classList.add("gecis-aktif");
-            
-            setTimeout(() => {
-                temayiGuncelle();
-                if(flas) flas.classList.remove("gecis-aktif");
-                
-                if (window.bipBopMesajYaz) {
-                    const log = document.getElementById("bipbop-mesaj");
-                    if (log) log.innerHTML = ""; 
-                    
-                    window.bipBopMesajYaz("MISSION PROTOCOL: REPAIR_TIMEMACHINE", "var(--secondary)");
-                    setTimeout(() => window.bipBopMesajYaz("SECTOR: DINOSAUR_ERA_01", "#fff"), 500);
-                    setTimeout(() => window.bipBopMesajYaz("OBJECTIVE: RETRIEVE TEMPORAL SHARD", "var(--tertiary)"), 1000);
-                    setTimeout(() => window.bipBopMesajYaz("STATUS: READY FOR COMMANDS", "var(--secondary)"), 1500);
-                }
-            }, 800);
+
+            const overlay = document.createElement('div');
+            overlay.style.cssText = `
+                position: fixed; top: 0; left: 0;
+                width: 100vw; height: 100vh;
+                background: black; z-index: 99999;
+            `;
+
+            const video = document.createElement('video');
+            video.src = 'assets/videos/intro.mp4';
+            video.style.cssText = `width: 100%; height: 100%; object-fit: cover;`;
+            video.autoplay = true;
+            video.playsInline = true;
+
+            const gecBtn = document.createElement('button');
+            gecBtn.innerText = 'Geç »';
+            gecBtn.style.cssText = `
+                position: absolute; bottom: 30px; right: 30px;
+                background: rgba(255,255,255,0.2); color: white;
+                border: 1px solid white; padding: 10px 20px;
+                font-size: 16px; cursor: pointer; border-radius: 8px;
+                z-index: 100000;
+            `;
+
+            overlay.appendChild(video);
+            overlay.appendChild(gecBtn);
+            document.body.appendChild(overlay);
+
+            function oyunuBaslat() {
+                overlay.remove();
+                window.screenShake('light');
+                baslangicEkrani.classList.add("gizle");
+                uiLayer.classList.remove("d-none");
+
+                const flas = document.getElementById("gecis-flas");
+                if(flas) flas.classList.add("gecis-aktif");
+
+                setTimeout(() => {
+                    temayiGuncelle();
+                    if(flas) flas.classList.remove("gecis-aktif");
+
+                    if (window.bipBopMesajYaz) {
+                        const log = document.getElementById("bipbop-mesaj");
+                        if (log) log.innerHTML = "";
+                        window.bipBopMesajYaz("MISSION PROTOCOL: REPAIR_TIMEMACHINE", "var(--secondary)");
+                        setTimeout(() => window.bipBopMesajYaz("SECTOR: DINOSAUR_ERA_01", "#fff"), 500);
+                        setTimeout(() => window.bipBopMesajYaz("OBJECTIVE: RETRIEVE TEMPORAL SHARD", "var(--tertiary)"), 1000);
+                        setTimeout(() => window.bipBopMesajYaz("STATUS: READY FOR COMMANDS", "var(--secondary)"), 1500);
+                    }
+                }, 800);
+            }
+
+            video.addEventListener('ended', oyunuBaslat);
+            gecBtn.addEventListener('click', oyunuBaslat);
         });
     }
 });
