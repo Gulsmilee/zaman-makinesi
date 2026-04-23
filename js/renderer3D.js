@@ -145,13 +145,53 @@ window.renderer3D = (function () {
         scene.add(hologrid);
     }
 
+    // World position used to project the 2D overlay marker
+    const _targetWorldPos = new THREE.Vector3(0, 0, 0);
+    const _screenV        = new THREE.Vector3();
+
     /** Place target on terrain surface at its designated cell. */
     function placeTarget() {
-        if (!target) return;
         const hedef = window.mevcutHedef || { x: COLS - 1, z: ROWS - 1 };
         const wp    = cellToWorld(hedef.x, hedef.z);
         const y     = sampleY(wp.x, wp.z) ?? 0;
-        target.position.set(wp.x, y, wp.z);
+        if (target) target.position.set(wp.x, y, wp.z);
+        // Project overlay at ground-plane level (y=0) so it sits on the grid regardless of terrain height
+        _targetWorldPos.set(wp.x, 0, wp.z);
+    }
+
+    /** Project 3D target to 2D screen and reposition the HTML overlay. */
+    function updateOverlayMarker() {
+        const el = document.getElementById('hedef-nesnesi');
+        if (!el || !camera || !renderer) return;
+
+        // Don't show if no content
+        if (!el.innerHTML.trim()) {
+            el.style.display = 'none';
+            return;
+        }
+
+        _screenV.copy(_targetWorldPos).project(camera);
+
+        const canvas = renderer.domElement;
+        const rect   = canvas.getBoundingClientRect();
+
+        // NDC → pixel coords inside the canvas
+        const px = (_screenV.x  *  0.5 + 0.5) * rect.width  + rect.left;
+        const py = (_screenV.y  * -0.5 + 0.5) * rect.height + rect.top;
+
+        // Hide when behind camera
+        if (_screenV.z > 1) {
+            el.style.display = 'none';
+            return;
+        }
+
+        el.style.display   = 'block';
+        el.style.position  = 'fixed';
+        el.style.left      = px + 'px';
+        el.style.top       = py + 'px';
+        el.style.transform = 'translate(-50%, -50%)';
+        el.style.zIndex    = '500';
+        el.style.pointerEvents = 'none';
     }
 
     /** Load a GLTF model, return a Promise<THREE.Group>. */
@@ -436,6 +476,8 @@ window.renderer3D = (function () {
             }
 
             if (target) target.rotation.y += 0.016;
+
+            updateOverlayMarker();
 
             envMixers.forEach(m  => m.update(dt));
             charMixers.forEach(m => m.update(dt));
