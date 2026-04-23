@@ -118,7 +118,7 @@ const CHARACTER_ASSETS = {
     {
         sinif: "tema-dinozor-oda",
         baslik: "Dinozorlar Çağı - Balta Girmemiş Orman",
-        hedefHTML: `🥚`,
+        hedefHTML: ``,
         envPath: "assets/diorama_trex_rigged_free/scene.gltf",
         targetPath: "assets/a_dinosaur_cub_sitting_in_a_dinosaur_egg/scene.gltf",
         envOffset:  { x: 0, y: 0, z: 0 },
@@ -128,7 +128,7 @@ const CHARACTER_ASSETS = {
     {
         sinif: "tema-misir-oda",
         baslik: "Antik Mısır - Piramit Dehlizi",
-        hedefHTML: `⚱️`,
+        hedefHTML: `⚰️`,
         envPath: "assets/environment_pack_-_egypt_map/scene.gltf",
         targetPath: null,
         envOffset:  { x: 0, y: 0, z: 0 },
@@ -171,7 +171,13 @@ function temayiGuncelle() {
     if (seviyeBaslik) seviyeBaslik.innerText = aktifTema.baslik;
 
     if (hedefNesnesi) {
-        hedefNesnesi.innerHTML = `<div class="hedef-animasyon">${aktifTema.hedefHTML}</div>`;
+        if (aktifTema.hedefHTML) {
+            hedefNesnesi.innerHTML = `<div class="hedef-animasyon">${aktifTema.hedefHTML}</div>`;
+            hedefNesnesi.style.display = 'block';
+        } else {
+            hedefNesnesi.innerHTML = '';
+            hedefNesnesi.style.display = 'none';
+        }
         hedefNesnesi.className = "hedef-merkez";
     }
 
@@ -191,8 +197,11 @@ function temayiGuncelle() {
             window.renderer3D.init("renderer-3d-viewport");
             window.renderer3D._inited = true;
         }
-        
-        if (aktifTema.envPath) {
+
+        // If this era was already preloaded in the background, skip 3D network load
+        if (window._preloadedEraIndex === window.mevcutTemaIndeksi) {
+            window._preloadedEraIndex = undefined; // consume
+        } else if (aktifTema.envPath) {
             if (window.renderer3D.resetGridCentre) {
                 window.renderer3D.resetGridCentre();
             }
@@ -213,14 +222,12 @@ function temayiGuncelle() {
                 aktifTema.envOffset || { x: 0, y: 0, z: 0 },
                 aktifTema.envScale  || 18
             ).then(() => {
-                // Apply manual grid offset after environment loads (matrices are ready)
                 if (aktifTema.gridOffset && window.renderer3D.setGridCentre) {
                     window.renderer3D.setGridCentre(
                         aktifTema.gridOffset.x,
                         aktifTema.gridOffset.z
                     );
                 }
-                // Always reload character & bipBop so they reposition on new terrain
                 window.renderer3D.loadCharacter("assets/character/scene.gltf");
                 window.renderer3D.loadBipBop("assets/space_maintenance_robot (1)/scene.gltf");
                 if (aktifTema.targetPath) {
@@ -351,6 +358,40 @@ document.addEventListener('DOMContentLoaded', () => {
             overlay.appendChild(video);
             overlay.appendChild(gecBtn);
             document.body.appendChild(overlay);
+
+            // ── Preload era 0 assets while the intro video plays ────────────────
+            if (!window.renderer3D._inited) {
+                window.renderer3D.init("renderer-3d-viewport");
+                window.renderer3D._inited = true;
+            }
+            const tema0 = temalar[0];
+            window.mevcutHedef = { x: 4, z: 4 };
+            if (window.renderer3D.resetGridCentre) window.renderer3D.resetGridCentre();
+            if (window.renderer3D.setHideOuterDome) window.renderer3D.setHideOuterDome(!!tema0.hideDome);
+            if (window.renderer3D.setThemeLighting) window.renderer3D.setThemeLighting(
+                tema0.ambientColor || 0xffffff, tema0.ambientIntensity || 0.65,
+                tema0.pointColor || 0x00ffff,   tema0.pointIntensity || 0
+            );
+            window.renderer3D.setRayOriginY(tema0.rayY || 60);
+            window.renderer3D.loadEnvironment(
+                tema0.envPath,
+                tema0.envOffset || { x: 0, y: 0, z: 0 },
+                tema0.envScale  || 18
+            ).then(() => {
+                if (tema0.gridOffset && window.renderer3D.setGridCentre) {
+                    window.renderer3D.setGridCentre(tema0.gridOffset.x, tema0.gridOffset.z);
+                }
+                return Promise.all([
+                    window.renderer3D.loadCharacter("assets/character/scene.gltf"),
+                    window.renderer3D.loadBipBop("assets/space_maintenance_robot (1)/scene.gltf"),
+                    tema0.targetPath ? window.renderer3D.loadTarget(tema0.targetPath) : Promise.resolve()
+                ]);
+            }).then(() => {
+                window._preloadedEraIndex = 0; // Signal: era 0 is ready
+            }).catch(() => {
+                window._preloadedEraIndex = undefined; // fallback: temayiGuncelle loads normally
+            });
+            // ── End preload ─────────────────────────────────────────────────────
 
             function oyunuBaslat() {
                 overlay.remove();
