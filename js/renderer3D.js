@@ -14,8 +14,9 @@ window.renderer3D = (function () {
     const ROWS      = 5;
     const CELL      = 0.9;        // small cells so grid fits on flat zone
     const INTERP    = 20;
-    const SCAN_R    = 10;
-    const SCAN_STEP = 0.4;
+    const SCAN_SAMPLES = 20;     // always 20x20 samples regardless of scale
+    let scanR      = 8;          // world-space radius to scan
+    let scanStep   = 0.8;        // step = scanR*2 / SCAN_SAMPLES
 
     // ── Module state ─────────────────────────────────────────────────────────
     let scene, camera, renderer, clock, controls;
@@ -65,31 +66,33 @@ window.renderer3D = (function () {
     }
 
     /** Scan terrain to find the elevated plateau's centre of mass.
+     *  Fast: always uses SCAN_SAMPLES x SCAN_SAMPLES grid (max 400 raycasts).
      *  If gridManual=true, skip scan and keep the manually set centre. */
     function detectGridCentre() {
-        if (gridManual) return;   // manual offset already set, trust it
+        if (gridManual) return;
 
         environment.updateMatrixWorld(true);
 
-        let maxY = -Infinity;
-        for (let x = -SCAN_R; x <= SCAN_R; x += SCAN_STEP) {
-            for (let z = -SCAN_R; z <= SCAN_R; z += SCAN_STEP) {
+        // Build a fixed-size sample grid over [-scanR, +scanR]
+        const samples = [];
+        const step = (scanR * 2) / SCAN_SAMPLES;
+        for (let i = 0; i <= SCAN_SAMPLES; i++) {
+            for (let j = 0; j <= SCAN_SAMPLES; j++) {
+                const x = -scanR + i * step;
+                const z = -scanR + j * step;
                 const y = sampleY(x, z);
-                if (y !== null && y > maxY) maxY = y;
+                if (y !== null) samples.push({ x, z, y });
             }
         }
 
-        // Use only the flattest, highest zone (top 40%) to avoid mountains
+        if (!samples.length) return;
+
+        const maxY = Math.max(...samples.map(s => s.y));
         const thresh = maxY * 0.6;
-        let sx = 0, sz = 0, n = 0;
-        for (let x = -SCAN_R; x <= SCAN_R; x += SCAN_STEP) {
-            for (let z = -SCAN_R; z <= SCAN_R; z += SCAN_STEP) {
-                const y = sampleY(x, z);
-                if (y !== null && y >= thresh) { sx += x; sz += z; n++; }
-            }
-        }
-        gridCX = n ? sx / n : 0;
-        gridCZ = n ? sz / n : 0;
+        const high = samples.filter(s => s.y >= thresh);
+
+        gridCX = high.length ? high.reduce((a, s) => a + s.x, 0) / high.length : 0;
+        gridCZ = high.length ? high.reduce((a, s) => a + s.z, 0) / high.length : 0;
     }
 
     /** Build terrain-hugging holographic grid and add to scene. */
@@ -115,7 +118,7 @@ window.renderer3D = (function () {
                 const wp = cellToWorld(s / INTERP, row);
                 const y  = sampleY(wp.x, wp.z);
                 if (y !== null) {
-                    seg.push(new THREE.Vector3(wp.x, y + 0.07, wp.z));
+                    seg.push(new THREE.Vector3(wp.x, y + 0.12, wp.z));
                 } else {
                     makeLine(seg); seg = [];
                 }
@@ -130,7 +133,7 @@ window.renderer3D = (function () {
                 const wp = cellToWorld(col, s / INTERP);
                 const y  = sampleY(wp.x, wp.z);
                 if (y !== null) {
-                    seg.push(new THREE.Vector3(wp.x, y + 0.07, wp.z));
+                    seg.push(new THREE.Vector3(wp.x, y + 0.12, wp.z));
                 } else {
                     makeLine(seg); seg = [];
                 }
@@ -306,7 +309,8 @@ window.renderer3D = (function () {
                         child.geometry.computeBoundingSphere();
                         const r = child.geometry.boundingSphere ? child.geometry.boundingSphere.radius : 0;
                         // Outer dome logic: keep visible for texture/bg but disable for grid/snapping
-                        if (r > 40 || child.name.toLowerCase().includes("dome") || child.name.toLowerCase().includes("sky") || child.name.toLowerCase().includes("sphere")) {
+                        // Use a high threshold relative to scale to avoid disabling the floor
+                        if (r > scale * 0.8 || child.name.toLowerCase().includes("dome") || child.name.toLowerCase().includes("sky") || child.name.toLowerCase().includes("sphere")) {
                             child.raycast = function() {}; // fully ignore collisions
                             if (child.material) {
                                 child.material.side = THREE.DoubleSide; // see from inside
@@ -322,17 +326,21 @@ window.renderer3D = (function () {
             scene.add(environment);
             environment.updateMatrixWorld(true);
 
+            // Tune scan radius relative to scale — cap at 40 world-units
+            // so we only look in the area where the model sits (near origin)
+            scanR = Math.min(scale * 0.35, 40);
+
             buildGrid();
             placeTarget();
             hoverY = 0;
         },
 
         async loadCharacter(path) {
-            if (character) { scene.remove(character); character = null; }
+            if (character) { scene.remove(character); character = null; charMixers = []; }
 
             const mesh = await loadGLTF(path, mx => charMixers.push(mx));
             mesh.scale.set(1.5, 1.5, 1.5);
-            mesh.rotation.y = 0; // Modelin doğal yüzü +Z eksenine bakacak
+            mesh.rotation.y = 0;
             floorPivot(mesh);
 
             const group = new THREE.Group();
@@ -356,7 +364,6 @@ window.renderer3D = (function () {
             mesh.scale.set(0.8, 0.8, 0.8);
             floorPivot(mesh);
 
-            // Start offset so it doesn't overlap character on first frame
             const wp = cellToWorld(0, 0);
             const y  = sampleY(wp.x, wp.z) ?? 0;
             mesh.position.set(wp.x + 2.2, y + 1.8, wp.z);
