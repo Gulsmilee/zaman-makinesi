@@ -79,10 +79,10 @@
                 </div>
             </div>
 
-            <div id="hedef-nesnesi" class="hedef-merkez"
-                style="transform: translateX(-50%); margin-left: 0; margin-bottom: 0;">
-                <div class="hedef-animasyon">💎</div>
-            </div>
+        </div><!-- /world-scene -->
+
+        <div id="hedef-nesnesi" style="display:none;">
+            <div class="hedef-animasyon">💎</div>
         </div>
 
         <div id="portal-enerji"></div>
@@ -155,12 +155,12 @@
 
         <div class="row flex-grow-1 align-items-end mb-2">
 
-            <div class="col-12 col-md-4 d-flex flex-column gap-3">
+            <div class="col-12 col-md-3 d-flex flex-column gap-3">
 
-                <div class="hologram-panel ink-border p-3 mb-2" style="border-left: 8px solid var(--secondary);">
-                    <div class="d-flex align-items-start gap-3">
+                <div class="hologram-panel ink-border p-2 mb-2" style="border-left: 8px solid var(--secondary);">
+                    <div class="d-flex align-items-start gap-2">
                         <div id="bipbop-diagnostics-icon" class="bipbop-gorsel-kucuk"
-                            style="width:50px; height: 50px; background:#1c1c38; border-radius:10px; border: 2px solid var(--secondary); overflow:hidden;">
+                            style="width:40px; height: 40px; background:#1c1c38; border-radius:10px; border: 2px solid var(--secondary); overflow:hidden; flex-shrink:0;">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"
                                 style="width: 100%; height: 100%; transform: scale(1.2) translateY(5px) translateX(-5px);">
                                 <radialGradient id="dinoEyeUI" cx="30%" cy="30%" r="50%">
@@ -181,35 +181,34 @@
                                 <path d="M25 35 Q10 30 20 50 Z" fill="#4a101b" />
                             </svg>
                         </div>
-                        <div class="flex-grow-1">
+                        <div class="flex-grow-1 min-w-0">
                             <h6 class="fw-black mb-1 p-1 bg-secondary text-black d-inline-block text-uppercase title-rotate"
-                                style="font-size: 0.8rem;">Bip-Bop Diagnostics</h6>
+                                style="font-size: 0.65rem;">Bip-Bop</h6>
                             <div id="mission-log-display"
-                                class="small mb-0 text-white-50 mt-2 fw-bold courier-font p-2 bg-black/40 rounded border border-white/10 overflow-hidden"
-                                style="height: 100px;">
-                                <p id="bipbop-mesaj" class="mb-0 m-0 p-0 text-secondary">
-                                    > INITIALIZING MISSION PROTOCOL...<br>
-                                    > SCANNING TEMPORAL RIFT...
+                                class="small mb-0 text-white-50 mt-1 fw-bold courier-font p-2 bg-black/40 rounded border border-white/10 overflow-hidden"
+                                style="height: 70px;">
+                                <p id="bipbop-mesaj" class="mb-0 m-0 p-0 text-secondary" style="font-size:0.7rem;">
+                                    &gt; INITIALIZING...<br>
+                                    &gt; SCANNING RIFT...
                                 </p>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="hologram-panel ink-border p-3">
-                    <h6 class="text-uppercase text-white-50 small fw-bold mb-3 d-flex align-items-center gap-2">
-                        <span class="text-secondary">●</span> Control Interface
+                <div class="hologram-panel ink-border p-2">
+                    <h6 class="text-uppercase text-white-50 small fw-bold mb-2 d-flex align-items-center gap-1" style="font-size:0.65rem;">
+                        <span class="text-secondary">●</span> commands.py
                     </h6>
                     <div class="d-flex flex-column gap-2">
-                        <button id="btn-ileri" class="btn btn-glass text-start px-4 active:translate-y-1">
-                            <span class="text-secondary fw-bold me-2">></span> robot.ileri()
+                        <button id="btn-ileri" class="btn btn-glass text-start px-3 py-2">
+                            <span style="color:#7f8c8d;font-size:0.7rem;font-weight:bold">>>> </span><span style="color:#c3a6ff">robot</span><span style="color:rgba(255,255,255,0.5)">.</span><span style="color:#9eff00;font-weight:bold">ileri</span><span style="color:rgba(255,255,255,0.5)">()</span>
                         </button>
-                        <button id="btn-sol" class="btn btn-glass text-start px-4 active:translate-y-1">
-                            <span class="text-secondary fw-bold me-2">
-                                << /span> robot.sola_don()
+                        <button id="btn-sol" class="btn btn-glass text-start px-3 py-2">
+                            <span style="color:#7f8c8d;font-size:0.7rem;font-weight:bold">>>> </span><span style="color:#c3a6ff">robot</span><span style="color:rgba(255,255,255,0.5)">.</span><span style="color:#9eff00;font-weight:bold">sol</span><span style="color:rgba(255,255,255,0.5)">()</span>
                         </button>
-                        <button id="btn-sag" class="btn btn-glass text-start px-4 active:translate-y-1">
-                            <span class="text-secondary fw-bold me-2">></span> robot.saga_don()
+                        <button id="btn-sag" class="btn btn-glass text-start px-3 py-2">
+                            <span style="color:#7f8c8d;font-size:0.7rem;font-weight:bold">>>> </span><span style="color:#c3a6ff">robot</span><span style="color:rgba(255,255,255,0.5)">.</span><span style="color:#9eff00;font-weight:bold">sag</span><span style="color:rgba(255,255,255,0.5)">()</span>
                         </button>
                     </div>
                 </div>
@@ -217,28 +216,29 @@
 
 
 
-            <div class="col-12 col-md-6 col-lg-4 ms-auto h-100 d-flex flex-column justify-content-end pb-3">
-                <div class="hologram-panel ink-border d-flex flex-column" style="height: 60vh;">
-                    <div class="p-3 border-bottom border-secondary border-opacity-25 pb-2 bg-black/40">
-                        <h6 class="text-uppercase text-white-50 small fw-bold mb-0 d-flex justify-content-between">
+
+            <div class="col-12 col-md-4 col-lg-3 ms-auto h-100 d-flex flex-column justify-content-end pb-3">
+                <div class="hologram-panel ink-border d-flex flex-column" style="height: 50vh;">
+                    <div class="p-2 border-bottom border-secondary border-opacity-25 bg-black/40">
+                        <h6 class="text-uppercase text-white-50 small fw-bold mb-0 d-flex justify-content-between" style="font-size:0.65rem;">
                             <span><span class="text-secondary">●</span> command_buffer.py</span>
-                            <span class="text-white-25 small" id="adim-sayaci">0 blocks</span>
+                            <span class="text-white-25 small" id="adim-sayaci">0 lines</span>
                         </h6>
                     </div>
 
                     <div id="kod-akisi"
-                        class="flex-grow-1 p-3 overflow-auto d-flex flex-column gap-2 code-font stone-tablet m-2 bg-black/60">
+                        class="flex-grow-1 p-2 overflow-auto d-flex flex-column gap-1 code-font stone-tablet m-1 bg-black/60">
                     </div>
 
-                    <div class="p-3 pt-0 mt-auto d-flex gap-2">
-                        <button id="btn-sil" class="btn btn-glass-warning flex-shrink-1 px-3">
+                    <div class="p-2 pt-0 mt-auto d-flex gap-2">
+                        <button id="btn-sil" class="btn btn-glass-warning flex-shrink-1 px-2" style="font-size:0.8rem;">
                             <span class="fw-bold">↶</span> Sil
                         </button>
-                        <button id="btn-temizle" class="btn btn-glass-danger flex-shrink-1 px-3">
+                        <button id="btn-temizle" class="btn btn-glass-danger flex-shrink-1 px-2" style="font-size:0.8rem;">
                             Temizle
                         </button>
                         <button id="btn-calistir"
-                            class="btn btn-glass-success flex-grow-1 fw-bold fw-bolder fs-5 text-uppercase shimmer-effect">
+                            class="btn btn-glass-success flex-grow-1 fw-bold fs-6 text-uppercase shimmer-effect">
                             ▶ ÇALIŞTIR
                         </button>
                     </div>

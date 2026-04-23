@@ -22,12 +22,15 @@ function updateBlockCount() {
 function komutEkle(komut) {
   komutKuyrugu.push(komut);
 
+  const methodMap = { "ileri": "ileri", "sağa dön": "sag", "sola dön": "sol" };
+  const method = methodMap[komut] || komut;
+
   const div = document.createElement("div");
-  div.className = "badge bg-info text-dark m-1 p-2 d-block text-start border border-light";
-  div.textContent = "⚙️ " + komut.toUpperCase();
+  div.style.cssText = "border-left:3px solid #9eff00;background:rgba(158,255,0,0.05);border-radius:4px;padding:4px 8px;font-size:0.8rem;";
+  div.innerHTML = `<span style="color:#7f8c8d;font-weight:bold">&gt;&gt;&gt; </span><span style="color:#c3a6ff">robot</span><span style="color:rgba(255,255,255,0.4)">.</span><span style="color:#9eff00;font-weight:bold">${method}</span><span style="color:rgba(255,255,255,0.4)">()</span>`;
   kodAkisi.appendChild(div);
 
-  if (bipBopMesaj) bipBopMesaj.innerText = `Harika! "${komut}" komutunu hafızaya aldım Kaptan!`;
+  if (bipBopMesaj) bipBopMesaj.innerText = `🤖 robot.${method}() eklendi!`;
   updateBlockCount();
 }
 
