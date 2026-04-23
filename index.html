@@ -1,16 +1,21 @@
 <!doctype html>
 <html lang="tr">
-  <head>
+
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Zaman Makinesi Tamircisi | 3. Şahıs Macera</title>
-    <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Plus+Jakarta+Sans:wght@700;800&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Plus+Jakarta+Sans:wght@700;800&family=Space+Grotesk:wght@400;600;700&display=swap"
+        rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="css/style.css" />
-  </head>
-  <body class="overflow-hidden bg-black d-flex align-items-center justify-content-center vh-100 m-0">
-    
-    <div id="game-container" class="position-relative overflow-hidden w-100 h-100" style="max-width: 1920px; max-height: 1080px; aspect-ratio: 16/9; box-shadow: 0 0 50px rgba(0,0,0,0.8);">
+</head>
+
+<body class="overflow-hidden bg-black d-flex align-items-center justify-content-center vh-100 m-0">
+
+    <div id="game-container" class="position-relative overflow-hidden w-100 h-100"
+        style="max-width: 1920px; max-height: 1080px; aspect-ratio: 16/9; box-shadow: 0 0 50px rgba(0,0,0,0.8);">
 
         <div id="baslangic-ekrani" class="d-flex flex-column align-items-center justify-content-center text-center">
             <h1 class="scooby-title mb-0">ZAMAN MAKİNESİ<br>TAMİRCİSİ</h1>
@@ -20,71 +25,82 @@
             </button>
         </div>
 
-    <div id="world-background" class="tema-dinozor"></div>
+        <div id="world-background" class="tema-dinozor"></div>
 
-    <div id="alarm-filtresi" class="tam-ekran-filtre d-none"></div>
-    <div id="gecis-flas" class="gecis-flas"></div>
+        <div id="alarm-filtresi" class="tam-ekran-filtre d-none"></div>
+        <div id="gecis-flas" class="gecis-flas"></div>
 
-    <div id="world-scene">
-        <div id="renderer-3d-viewport" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1;">
-        </div>
+        <div id="world-scene">
+            <div id="renderer-3d-viewport"
+                style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1;">
+            </div>
 
-        <div id="perspektif-yol" class="oyun-gridi" style="display: none;">
-            <div id="karakter-kapsayici" class="d-flex align-items-end justify-content-center" style="position: absolute; width: 0; transform-style: preserve-3d; pointer-events: none; z-index: 10;">
-                <div id="bipbop-karekter-yani" style="width: 70px; height: 80px; position: absolute; left: 40px; bottom: 85px; z-index: 10;">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" style="width: 100%; height: 100%;">
-                        <defs>
-                            <radialGradient id="dinoEye" cx="30%" cy="30%" r="50%">
-                                <stop offset="0%" stop-color="#00ffff"/>
-                                <stop offset="100%" stop-color="#0066ff"/>
-                            </radialGradient>
-                        </defs>
-                        <path d="M40 90 Q10 100 0 80 Q20 85 40 85 Z" fill="#661a29"/>
-                        <path d="M55 90 L50 110 L60 110 L65 95 Z" fill="#4a101b"/>
-                        <rect x="50" y="105" width="10" height="5" fill="#f0e6d2"/> 
-                        <ellipse cx="60" cy="70" rx="25" ry="20" fill="#802033" transform="rotate(-15 60 70)"/>
-                        <path d="M70 90 L65 115 L75 115 L78 95 Z" fill="#802033"/>
-                        <rect x="65" y="105" width="10" height="5" fill="#f0e6d2"/> 
-                        <path d="M65 115 L62 120 M70 115 L70 120 M75 115 L78 120" stroke="#f0e6d2" stroke-width="2"/> 
-                        <rect x="45" y="45" width="30" height="20" rx="5" fill="#5c4a3d"/>
-                        <path d="M48 45 Q55 30 65 45 Z" fill="#8bc34a"/>
-                        <path d="M55 45 Q65 25 75 45 Z" fill="#689f38"/>
-                        <path d="M75 60 Q85 40 80 20 L110 30 Q120 40 100 50 L85 65 Z" fill="#802033"/>
-                        <path d="M80 45 Q105 45 105 50 Q105 55 80 55 Z" fill="#ffbda1" /> 
-                        <path d="M95 45 L98 48 L100 45 L103 48 L105 45 Z" fill="#fff"/>
-                        <path d="M80 70 L90 85 L95 82" fill="none" stroke="#802033" stroke-width="4" stroke-linecap="round"/>
-                        <circle cx="85" cy="30" r="7" fill="url(#dinoEye)">
-                            <animate attributeName="r" values="7;8;7" dur="2s" repeatCount="indefinite"/>
-                        </circle>
-                        <ellipse cx="85" cy="30" rx="2" ry="5" fill="#000" transform="rotate(20 85 30)"/>
-                        <circle cx="70" cy="35" r="5" fill="none" stroke="#ffd700" stroke-width="2"/>
-                        <polygon points="70,40 73,48 67,48" fill="#ffd700"/>
-                        <path d="M75 15 Q65 10 70 20 Z" fill="#4a101b"/>
-                        <path d="M70 20 Q60 15 65 25 Z" fill="#4a101b"/>
-                        <path d="M70 50 L90 60 L85 65 L65 55 Z" fill="#f4a261"/>
-                        <path d="M70 55 L85 62" stroke="#e76f51" stroke-width="2"/>
-                    </svg>
-                </div>
+            <div id="perspektif-yol" class="oyun-gridi" style="display: none;">
+                <div id="karakter-kapsayici" class="d-flex align-items-end justify-content-center"
+                    style="position: absolute; width: 0; transform-style: preserve-3d; pointer-events: none; z-index: 10;">
+                    <div id="bipbop-karekter-yani"
+                        style="width: 70px; height: 80px; position: absolute; left: 40px; bottom: 85px; z-index: 10;">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"
+                            style="width: 100%; height: 100%;">
+                            <defs>
+                                <radialGradient id="dinoEye" cx="30%" cy="30%" r="50%">
+                                    <stop offset="0%" stop-color="#00ffff" />
+                                    <stop offset="100%" stop-color="#0066ff" />
+                                </radialGradient>
+                            </defs>
+                            <path d="M40 90 Q10 100 0 80 Q20 85 40 85 Z" fill="#661a29" />
+                            <path d="M55 90 L50 110 L60 110 L65 95 Z" fill="#4a101b" />
+                            <rect x="50" y="105" width="10" height="5" fill="#f0e6d2" />
+                            <ellipse cx="60" cy="70" rx="25" ry="20" fill="#802033" transform="rotate(-15 60 70)" />
+                            <path d="M70 90 L65 115 L75 115 L78 95 Z" fill="#802033" />
+                            <rect x="65" y="105" width="10" height="5" fill="#f0e6d2" />
+                            <path d="M65 115 L62 120 M70 115 L70 120 M75 115 L78 120" stroke="#f0e6d2"
+                                stroke-width="2" />
+                            <rect x="45" y="45" width="30" height="20" rx="5" fill="#5c4a3d" />
+                            <path d="M48 45 Q55 30 65 45 Z" fill="#8bc34a" />
+                            <path d="M55 45 Q65 25 75 45 Z" fill="#689f38" />
+                            <path d="M75 60 Q85 40 80 20 L110 30 Q120 40 100 50 L85 65 Z" fill="#802033" />
+                            <path d="M80 45 Q105 45 105 50 Q105 55 80 55 Z" fill="#ffbda1" />
+                            <path d="M95 45 L98 48 L100 45 L103 48 L105 45 Z" fill="#fff" />
+                            <path d="M80 70 L90 85 L95 82" fill="none" stroke="#802033" stroke-width="4"
+                                stroke-linecap="round" />
+                            <circle cx="85" cy="30" r="7" fill="url(#dinoEye)">
+                                <animate attributeName="r" values="7;8;7" dur="2s" repeatCount="indefinite" />
+                            </circle>
+                            <ellipse cx="85" cy="30" rx="2" ry="5" fill="#000" transform="rotate(20 85 30)" />
+                            <circle cx="70" cy="35" r="5" fill="none" stroke="#ffd700" stroke-width="2" />
+                            <polygon points="70,40 73,48 67,48" fill="#ffd700" />
+                            <path d="M75 15 Q65 10 70 20 Z" fill="#4a101b" />
+                            <path d="M70 20 Q60 15 65 25 Z" fill="#4a101b" />
+                            <path d="M70 50 L90 60 L85 65 L65 55 Z" fill="#f4a261" />
+                            <path d="M70 55 L85 62" stroke="#e76f51" stroke-width="2" />
+                        </svg>
+                    </div>
                 </div>
             </div>
-            
-            <div id="hedef-nesnesi" class="hedef-merkez" style="transform: translateX(-50%); margin-left: 0; margin-bottom: 0;">
+
+            <div id="hedef-nesnesi" class="hedef-merkez"
+                style="transform: translateX(-50%); margin-left: 0; margin-bottom: 0;">
                 <div class="hedef-animasyon">💎</div>
             </div>
         </div>
-        
+
         <div id="portal-enerji"></div>
-        <div id="kutlama-yazisi" class="kutlama-yazisi">TEBRİKLER! 🎊<br><small class="fs-5">Harika iş çıkardın Kaptan!</small></div>
+        <div id="kutlama-yazisi" class="kutlama-yazisi">TEBRİKLER! 🎊<br><small class="fs-5">Harika iş çıkardın
+                Kaptan!</small></div>
     </div>
 
 
-    <div id="ui-layer" class="container-fluid vh-100 p-4 flex-column position-fixed top-0 start-0 d-none" style="z-index: 1000; pointer-events: none;">
-        
+    <div id="ui-layer" class="container-fluid vh-100 p-4 flex-column position-fixed top-0 start-0 d-none"
+        style="z-index: 1000; pointer-events: none;">
+
         <div class="row mb-4">
             <div class="col-12">
-                <nav class="hologram-panel ink-border px-4 py-2 d-flex justify-content-between align-items-center mb-2" style="background: rgba(26, 26, 46, 0.9);">
+                <nav class="hologram-panel ink-border px-4 py-2 d-flex justify-content-between align-items-center mb-2"
+                    style="background: rgba(26, 26, 46, 0.9);">
                     <div class="d-flex align-items-center gap-4">
-                        <span class="text-xl font-black text-secondary drop-shadow-sm title-rotate">MYSTERY MACHINE</span>
+                        <span class="text-xl font-black text-secondary drop-shadow-sm title-rotate">MYSTERY
+                            MACHINE</span>
                         <div class="d-none d-md-flex gap-4 text-white-50 small fw-bold">
                             <span class="text-secondary border-bottom border-secondary">MISSION_LOG</span>
                             <span class="hover:text-primary cursor-pointer">MAP_INTEL</span>
@@ -100,30 +116,36 @@
                             <div class="integrity-container">
                                 <div id="integrity-bar" class="integrity-fill"></div>
                             </div>
-                            <small class="text-white-50 fw-bold" style="font-size: 0.6rem; letter-spacing: 1px;">CORE_INTEGRITY</small>
+                            <small class="text-white-50 fw-bold"
+                                style="font-size: 0.6rem; letter-spacing: 1px;">CORE_INTEGRITY</small>
                         </div>
                         <div class="glass-panel px-3 py-1 d-flex align-items-center gap-2">
                             <span class="fs-6">🗺️</span>
                             <strong class="text-white small text-uppercase" id="seviye-baslik">Dinozorlar Çağı</strong>
                         </div>
                         <div class="avatar-2d-container" style="background:#5c4a3d;">
-                            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: 100%;">
+                            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"
+                                style="width: 100%; height: 100%;">
                                 <circle cx="50" cy="50" r="35" fill="#a07148" />
-                                <path d="M15 50 Q50 10 85 50" fill="#2c2c2c"/> 
-                                <path d="M15 40 Q50 20 85 40 L80 15 Q50 0 20 15 Z" fill="#e63946"/> 
-                                <path d="M25 50 Q50 25 75 50" fill="none" stroke="#2c2c2c" stroke-width="8" stroke-linecap="round"/> 
-                                <rect x="25" y="15" width="20" height="20" rx="10" fill="#dfa539" stroke="#5c4a3d" stroke-width="3"/>
+                                <path d="M15 50 Q50 10 85 50" fill="#2c2c2c" />
+                                <path d="M15 40 Q50 20 85 40 L80 15 Q50 0 20 15 Z" fill="#e63946" />
+                                <path d="M25 50 Q50 25 75 50" fill="none" stroke="#2c2c2c" stroke-width="8"
+                                    stroke-linecap="round" />
+                                <rect x="25" y="15" width="20" height="20" rx="10" fill="#dfa539" stroke="#5c4a3d"
+                                    stroke-width="3" />
                                 <circle cx="35" cy="25" r="5" fill="#00ffff" />
-                                <rect x="55" y="15" width="20" height="20" rx="10" fill="#dfa539" stroke="#5c4a3d" stroke-width="3"/>
+                                <rect x="55" y="15" width="20" height="20" rx="10" fill="#dfa539" stroke="#5c4a3d"
+                                    stroke-width="3" />
                                 <circle cx="65" cy="25" r="5" fill="#00ffff" />
-                                <line x1="45" y1="25" x2="55" y2="25" stroke="#5c4a3d" stroke-width="4"/> 
+                                <line x1="45" y1="25" x2="55" y2="25" stroke="#5c4a3d" stroke-width="4" />
                                 <circle class="avatar-eye" cx="35" cy="55" r="6" fill="#4a2511" />
                                 <circle cx="37" cy="53" r="2" fill="#fff" />
                                 <circle class="avatar-eye" cx="65" cy="55" r="6" fill="#4a2511" />
                                 <circle cx="67" cy="53" r="2" fill="#fff" />
-                                <path d="M40 70 Q50 80 60 70" fill="none" stroke="#60301a" stroke-width="3" stroke-linecap="round"/>
-                                <circle cx="25" cy="65" r="6" fill="#e6a481" opacity="0.5"/>
-                                <circle cx="75" cy="65" r="6" fill="#e6a481" opacity="0.5"/>
+                                <path d="M40 70 Q50 80 60 70" fill="none" stroke="#60301a" stroke-width="3"
+                                    stroke-linecap="round" />
+                                <circle cx="25" cy="65" r="6" fill="#e6a481" opacity="0.5" />
+                                <circle cx="75" cy="65" r="6" fill="#e6a481" opacity="0.5" />
                             </svg>
                         </div>
                     </div>
@@ -132,33 +154,39 @@
         </div>
 
         <div class="row flex-grow-1 align-items-end mb-2">
-            
+
             <div class="col-12 col-md-4 d-flex flex-column gap-3">
-                
+
                 <div class="hologram-panel ink-border p-3 mb-2" style="border-left: 8px solid var(--secondary);">
                     <div class="d-flex align-items-start gap-3">
-                        <div id="bipbop-diagnostics-icon" class="bipbop-gorsel-kucuk" style="width:50px; height: 50px; background:#1c1c38; border-radius:10px; border: 2px solid var(--secondary); overflow:hidden;">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" style="width: 100%; height: 100%; transform: scale(1.2) translateY(5px) translateX(-5px);">
+                        <div id="bipbop-diagnostics-icon" class="bipbop-gorsel-kucuk"
+                            style="width:50px; height: 50px; background:#1c1c38; border-radius:10px; border: 2px solid var(--secondary); overflow:hidden;">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"
+                                style="width: 100%; height: 100%; transform: scale(1.2) translateY(5px) translateX(-5px);">
                                 <radialGradient id="dinoEyeUI" cx="30%" cy="30%" r="50%">
-                                    <stop offset="0%" stop-color="#00ffff"/>
-                                    <stop offset="100%" stop-color="#0066ff"/>
+                                    <stop offset="0%" stop-color="#00ffff" />
+                                    <stop offset="100%" stop-color="#0066ff" />
                                 </radialGradient>
-                                <path d="M40 100 L40 60 Q40 20 70 30 Q105 40 85 60 L60 70 L60 100 Z" fill="#802033"/>
-                                <path d="M40 60 Q80 50 85 60 Q70 75 40 80 Z" fill="#ffbda1" /> 
-                                <path d="M60 55 L65 60 L70 55 L75 60" fill="none" stroke="#fff" stroke-width="4" stroke-linejoin="round"/>
+                                <path d="M40 100 L40 60 Q40 20 70 30 Q105 40 85 60 L60 70 L60 100 Z" fill="#802033" />
+                                <path d="M40 60 Q80 50 85 60 Q70 75 40 80 Z" fill="#ffbda1" />
+                                <path d="M60 55 L65 60 L70 55 L75 60" fill="none" stroke="#fff" stroke-width="4"
+                                    stroke-linejoin="round" />
                                 <circle cx="55" cy="35" r="12" fill="url(#dinoEyeUI)">
-                                    <animate attributeName="r" values="12;14;12" dur="2s" repeatCount="indefinite"/>
+                                    <animate attributeName="r" values="12;14;12" dur="2s" repeatCount="indefinite" />
                                 </circle>
-                                <ellipse cx="55" cy="35" rx="3" ry="8" fill="#000" transform="rotate(20 55 35)"/>
-                                <circle cx="35" cy="45" r="6" fill="none" stroke="#ffd700" stroke-width="3"/>
-                                <polygon points="35,51 39,60 31,60" fill="#ffd700"/>
-                                <path d="M30 20 Q15 15 25 35 Z" fill="#4a101b"/>
-                                <path d="M25 35 Q10 30 20 50 Z" fill="#4a101b"/>
+                                <ellipse cx="55" cy="35" rx="3" ry="8" fill="#000" transform="rotate(20 55 35)" />
+                                <circle cx="35" cy="45" r="6" fill="none" stroke="#ffd700" stroke-width="3" />
+                                <polygon points="35,51 39,60 31,60" fill="#ffd700" />
+                                <path d="M30 20 Q15 15 25 35 Z" fill="#4a101b" />
+                                <path d="M25 35 Q10 30 20 50 Z" fill="#4a101b" />
                             </svg>
                         </div>
                         <div class="flex-grow-1">
-                            <h6 class="fw-black mb-1 p-1 bg-secondary text-black d-inline-block text-uppercase title-rotate" style="font-size: 0.8rem;">Bip-Bop Diagnostics</h6>
-                            <div id="mission-log-display" class="small mb-0 text-white-50 mt-2 fw-bold courier-font p-2 bg-black/40 rounded border border-white/10 overflow-hidden" style="height: 100px;">
+                            <h6 class="fw-black mb-1 p-1 bg-secondary text-black d-inline-block text-uppercase title-rotate"
+                                style="font-size: 0.8rem;">Bip-Bop Diagnostics</h6>
+                            <div id="mission-log-display"
+                                class="small mb-0 text-white-50 mt-2 fw-bold courier-font p-2 bg-black/40 rounded border border-white/10 overflow-hidden"
+                                style="height: 100px;">
                                 <p id="bipbop-mesaj" class="mb-0 m-0 p-0 text-secondary">
                                     > INITIALIZING MISSION PROTOCOL...<br>
                                     > SCANNING TEMPORAL RIFT...
@@ -177,7 +205,8 @@
                             <span class="text-secondary fw-bold me-2">></span> robot.ileri()
                         </button>
                         <button id="btn-sol" class="btn btn-glass text-start px-4 active:translate-y-1">
-                            <span class="text-secondary fw-bold me-2"><</span> robot.sola_don()
+                            <span class="text-secondary fw-bold me-2">
+                                << /span> robot.sola_don()
                         </button>
                         <button id="btn-sag" class="btn btn-glass text-start px-4 active:translate-y-1">
                             <span class="text-secondary fw-bold me-2">></span> robot.saga_don()
@@ -196,10 +225,11 @@
                             <span class="text-white-25 small" id="adim-sayaci">0 blocks</span>
                         </h6>
                     </div>
-                    
-                    <div id="kod-akisi" class="flex-grow-1 p-3 overflow-auto d-flex flex-column gap-2 code-font stone-tablet m-2 bg-black/60">
+
+                    <div id="kod-akisi"
+                        class="flex-grow-1 p-3 overflow-auto d-flex flex-column gap-2 code-font stone-tablet m-2 bg-black/60">
                     </div>
-                    
+
                     <div class="p-3 pt-0 mt-auto d-flex gap-2">
                         <button id="btn-sil" class="btn btn-glass-warning flex-shrink-1 px-3">
                             <span class="fw-bold">↶</span> Sil
@@ -207,28 +237,37 @@
                         <button id="btn-temizle" class="btn btn-glass-danger flex-shrink-1 px-3">
                             Temizle
                         </button>
-                        <button id="btn-calistir" class="btn btn-glass-success flex-grow-1 fw-bold fw-bolder fs-5 text-uppercase shimmer-effect">
+                        <button id="btn-calistir"
+                            class="btn btn-glass-success flex-grow-1 fw-bold fw-bolder fs-5 text-uppercase shimmer-effect">
                             ▶ ÇALIŞTIR
                         </button>
                     </div>
                 </div>
             </div>
-            
+
         </div>
-        
-        <div id="oyun-sonu-ekrani" class="position-absolute top-0 start-0 w-100 h-100 flex-column align-items-center justify-content-center" style="display: none; z-index: 2000; background: radial-gradient(circle, rgba(0,0,0,0.7) 0%, #111 80%); backdrop-filter: blur(10px);">
+
+        <div id="oyun-sonu-ekrani"
+            class="position-absolute top-0 start-0 w-100 h-100 flex-column align-items-center justify-content-center"
+            style="display: none; z-index: 2000; background: radial-gradient(circle, rgba(0,0,0,0.7) 0%, #111 80%); backdrop-filter: blur(10px);">
             <div id="konfeti-alani" class="position-absolute w-100 h-100 overflow-hidden pointer-events-none"></div>
-            <h1 class="tebrikler-baslik text-center text-uppercase line-height-sm">🎉 TEBRİKLER! <br> ZAMAN MAKİNESİ TAMİRCİSİ! 🚀</h1>
-            <p class="text-white fs-3 mt-4 fw-bold text-center" style="text-shadow: 0 0 10px black;">Tüm çağların zaman parçalarını başarıyla topladın!</p>
+            <h1 class="tebrikler-baslik text-center text-uppercase line-height-sm">🎉 TEBRİKLER! <br> ZAMAN MAKİNESİ
+                TAMİRCİSİ! 🚀</h1>
+            <p class="text-white fs-3 mt-4 fw-bold text-center" style="text-shadow: 0 0 10px black;">Tüm çağların zaman
+                parçalarını başarıyla topladın!</p>
             <div style="width:120px; margin-top: 30px;">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 120" style="width: 100%; height: 100%; filter: drop-shadow(0px 0px 30px rgba(0,255,255,1));">
-                    <line x1="50" y1="20" x2="50" y2="5" stroke="#95a5a6" stroke-width="4"/>
-                    <circle cx="50" cy="5" r="5" fill="#e74c3c"><animate attributeName="fill" values="#e74c3c;#c0392b;#e74c3c" dur="1s" repeatCount="indefinite"/></circle>
-                    <rect x="20" y="20" width="60" height="50" rx="10" fill="#2c3e50"/>
-                    <rect x="25" y="25" width="50" height="40" rx="5" fill="#111"/>
-                    <path d="M30 45 Q50 65 70 45" stroke="#00ffff" stroke-width="4" fill="transparent"/>
-                    <path d="M40 70 L60 70 L70 110 L30 110 Z" fill="#7f8c8d" opacity="0.8"/>
-                    <ellipse cx="50" cy="110" rx="20" ry="8" fill="#00ffff" opacity="0.6"/>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 120"
+                    style="width: 100%; height: 100%; filter: drop-shadow(0px 0px 30px rgba(0,255,255,1));">
+                    <line x1="50" y1="20" x2="50" y2="5" stroke="#95a5a6" stroke-width="4" />
+                    <circle cx="50" cy="5" r="5" fill="#e74c3c">
+                        <animate attributeName="fill" values="#e74c3c;#c0392b;#e74c3c" dur="1s"
+                            repeatCount="indefinite" />
+                    </circle>
+                    <rect x="20" y="20" width="60" height="50" rx="10" fill="#2c3e50" />
+                    <rect x="25" y="25" width="50" height="40" rx="5" fill="#111" />
+                    <path d="M30 45 Q50 65 70 45" stroke="#00ffff" stroke-width="4" fill="transparent" />
+                    <path d="M40 70 L60 70 L70 110 L30 110 Z" fill="#7f8c8d" opacity="0.8" />
+                    <ellipse cx="50" cy="110" rx="20" ry="8" fill="#00ffff" opacity="0.6" />
                 </svg>
             </div>
             <p class="text-white bg-dark px-4 py-2 mt-5 rounded-pill shadow">Laboratuvara dönülüyor...</p>
@@ -236,13 +275,13 @@
     </div>
 
     <div class="modal fade glass-modal" id="quizModal" tabindex="-1" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div id="quiz-icerik" class="modal-content glass-panel border-info shadow-lg p-3">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div id="quiz-icerik" class="modal-content glass-panel border-info shadow-lg p-3">
+            </div>
         </div>
-      </div>
     </div>
-    
-    </div> 
+
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -252,5 +291,6 @@
     <script defer src="js/bulmaca.js"></script>
     <script defer src="js/motor.js"></script>
     <script defer src="js/sahne.js"></script>
-  </body>
+</body>
+
 </html>
